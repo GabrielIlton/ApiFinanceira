@@ -1,0 +1,22 @@
+{
+  "name": "nodejs",
+  "version": "1.0.0",
+  "description": "-GET: Leitura\r -POST: Criação\r -PULL: Atualização\r -DELETE: Deleção\r -PATCH: Atualização parcial",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "nodemon --ignore node_modules/ src/server.js",
+    "dev:inspect": "nodemon --ignore node_modules/ --inspect src/server.js"
+
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^6.0.8",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
