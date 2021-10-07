@@ -7,20 +7,12 @@ const TransactionAccount = new Schema({
     },
     type:{
         type: String,
-        enum: ['send', 'receive']
+        enum: ['cashout', 'cashin']
     },
     accountId: {
         type: String,
         required: true,
-    },
-    cashin: {
-        type: Number,
-        required: false,
-    },
-    chashout: {
-        type: Number,
-        required: false,
-    },
+    }
 },
 {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },

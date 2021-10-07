@@ -8,7 +8,7 @@ const FinanceMiddlewares = require('../middlewares/FinanceMiddlewares');
 
 router.post("/account", AccountController.createAccount);
 
-router.get("/statement/:cpf", FinanceMiddlewares.existeCpf, StatementController.listStatement);
+router.get("/statement", StatementController.listStatement);
 
 router.post("/deposit/:cpf", FinanceMiddlewares.existeCpf, AccountController.depositAccount);
 
@@ -16,13 +16,17 @@ router.post("/withdraw/:cpf", FinanceMiddlewares.existeCpf, AccountController.wi
 
 router.get("/statementByDate/", FinanceMiddlewares.existeCpf, StatementController.statementByDate);
 
-router.put("/account/:cpf", FinanceMiddlewares.existeCpf, AccountController.updateName);
+router.put("/updatenameaccount/:cpf", FinanceMiddlewares.existeCpf, AccountController.updateName);
 
-router.get("/account/", FinanceMiddlewares.existeCpf, AccountController.getAccount);
+router.get("/accountsget", AccountController.getAccount);
 
 router.get("/accountdetails/:cpf", FinanceMiddlewares.existeCpf, AccountController.getAccountDetails);
 
 router.delete("/account/:cpf", FinanceMiddlewares.existeCpf, AccountController.deleteAccount);
+
+router.post("/accountP2P", FinanceMiddlewares.existeCpf, AccountController.transactionAccount);
+
+router.get("/accountsaldo/:cpf", FinanceMiddlewares.existeCpf, AccountController.getSaldo);
 
 
 // //Deve conter envio de algum documento referente a pessoa;
@@ -32,8 +36,8 @@ router.delete("/account/:cpf", FinanceMiddlewares.existeCpf, AccountController.d
 // //Deve conter uma listagem de contas;
 // //Deve conter um EndPoint de detalhes da conta
 // //Cada conta deve ter um saldo único;
-//todo Deve conter um EndPoint de P2P;
-//todo Deve conter um EndPoint de vizualização de saldo da conta;
+// // Deve conter um EndPoint de P2P;
+// // Deve conter um EndPoint de vizualização de saldo da conta;
 
 module.exports = router;//*Exporta as rotas
 

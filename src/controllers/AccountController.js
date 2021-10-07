@@ -2,6 +2,7 @@ const mongoose = require('mongoose');//*Importa o mongoose
 mongoose.connect('mongodb://localhost:27017/apiFinanceira');//*Conecta o mongoose com o mongodb
 const AccountModel = require('../models/account');//*Importa a collection de models
 const StatementModel = require('../models/statement');
+const TransactionModel = require('../models/transaction');
 
 class AccountController {//*É uma classe que tem todas a funcion de account
     async createAccount(req, res) {
@@ -50,7 +51,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
             const total = deposit + account.balance;
             const depositAccount = await AccountModel.findOneAndUpdate({ cpf, deleted: false }, { balance: Number(total)});
             
-            return res.status(201).json({ depositAccount });
+            return res.status(201).json({name: account.name, total });;
         
         } catch (error) {
             return res.status(400).json({message: error.message});//?Retorna o status
@@ -93,7 +94,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
 
     async getAccount (req, res) {
         try {
-            const accounts = await AccountModel.find({}, {name:1 ,cpf: 1});//*Primeiro parametro eh a pesquisa e o segundo vai mostrar
+            const accounts = await AccountModel.find({}, {name:1, cpf:1});//*Primeiro parametro eh a pesquisa e o segundo vai mostrar
             if(!accounts) throw 'Conta não existe.';
             return res.status(200).json({ accounts });
         }catch (error) {
@@ -104,9 +105,9 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async getAccountDetails (req, res) {
         try {
             const { cpf } = req.params;
-            const accounts = await AccountModel.findOne({cpf, deleted: false});
-            if(!accounts) throw 'Conta não existe.';
-            return res.status(200).json({ accounts });
+            const account = await AccountModel.findOne({ cpf, deleted: false });
+            if(!account) throw 'Conta não existe.';
+            return res.status(200).json({ account });
         }catch (error) {
             return res.status(400).json({error});   
         }
@@ -124,26 +125,61 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         }
     };
 
-    async depositAccount (req, res) {
+   async transactionAccount (req, res) {
         try {
-            const{ cpf } = req.params;
-            const { deposit } = req.body;//Desestruturação
-            const account = await AccountModel.findOne({cpf, deleted: false});//*Faz a pesquisa se cpf já existe
-            if(!account) throw 'Conta não existe';
+            const { cpfReciever, amount} = req.body;
+            const { accountId } = res;
+            const accountReciever = await AccountModel.findOne({ cpf: cpfReciever, deleted: false });//*Faz a pesquisa se cpf já existe
+            const accountSend = await AccountModel.findOne({ _id: accountId._id });
             
-            await StatementModel.create({//*Instancia e cria no banco os dados
-                type: 'deposit',
-                amount: deposit,
-                accountId: account._id.toString()
+            if(!accountSend.balance > 0) throw 'Não tem saldo.';
+            if(!accountReciever) throw 'Conta não existe';
+            if(accountSend.balance < amount) throw 'Não tem saldo suficiente para a transação.';
+            
+            const cashoutUpdate = await TransactionModel.create({//*Instancia e cria no banco os dados 
+                type: 'cashout',
+                amount: amount,//*Ammount
+                accountId: accountSend._id
             });
-            const total = deposit + account.balance;
-            const depositAccount = await AccountModel.findOneAndUpdate({ cpf, deleted: false }, { balance: Number(total)});
+            const totalSend = accountSend.balance - amount;
+            const accountSendUpdate = await AccountModel.findOneAndUpdate({ cpf: accountSend.cpf }, { balance: totalSend}, {new: true});
+
+            const cashinUpdate = await TransactionModel.create({//*Instancia e cria no banco os dados
+                type: 'cashin',
+                amount: amount,
+                accountId: accountReciever._id
+            });
+            const totalReciever = amount + accountReciever.balance;
+            const cashinAccount = await AccountModel.findOneAndUpdate({ cpf: cpfReciever }, { balance: totalReciever}, {new: true});
+
+            await StatementModel.create({
+                type:'cashoutP2P',
+                amount: amount,    
+                accountId: accountSend._id
+            });
+            await StatementModel.create({ 
+                type:'cashinP2P',
+                amount: amount, 
+                accountId: accountReciever._id
+            });
             
-            return res.status(201).json({ depositAccount });
+            return res.status(201).json({ balanceSend: accountSend.balance - amount });
         
         } catch (error) {
             return res.status(400).json({message: error.message});//?Retorna o status
         }
+    };
+
+    async getSaldo (req, res) {
+        try {
+            const { cpf } = req.params;
+            const account = await AccountModel.findOne({ cpf, deleted: false });
+            if(!account) throw 'Conta não existe.';
+            return res.status(200).json({ Nome: account.name, Saldo: account.balance });
+          
+        } catch (error) {
+            return res.status(404).json({message: error.message});
+        };
     };
 }      
 
