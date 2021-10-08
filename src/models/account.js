@@ -1,4 +1,5 @@
 const { model, Schema } = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const AccountSchema = new Schema({
      name: {
@@ -8,6 +9,16 @@ const AccountSchema = new Schema({
      cpf: {
           type: Number,
           required: true,  
+     },
+     email: {
+          type: String,
+          unique: true,
+          required: true,
+          lowercase: true,
+     },
+     password: {
+          type: String,
+          required: true
      },
      endereco: new Schema ({
           rua:{ type: String, required: true },
@@ -26,6 +37,13 @@ const AccountSchema = new Schema({
           type: Number,
           default: 0
      }    
+});
+
+AccountSchema.pre('save', async function(next){
+     const hash = await bcrypt.hash(this.password, 10);
+     this.password = hash;     
+
+     next();
 });
 
 module.exports = model('Account', AccountSchema);//*Envia pro banco

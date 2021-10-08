@@ -6,12 +6,12 @@
   "scripts": {
     "dev": "nodemon --ignore node_modules/ src/server.js",
     "dev:inspect": "nodemon --ignore node_modules/ --inspect src/server.js"
-
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "express": "^4.17.1",
     "mongoose": "^6.0.8",
     "uuid": "^8.3.2"

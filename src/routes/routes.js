@@ -3,6 +3,8 @@ const router = Router();//*Importa a function router
 const AccountController = require('../controllers/AccountController');//*Importa os controllers
 const StatementController = require('../controllers/StatementController');
 const FinanceMiddlewares = require('../middlewares/FinanceMiddlewares');
+const bcrypt = require('bcryptjs');
+
 
 //!SÃO TODAS AS ROTAS DA APLICATION
 
@@ -16,7 +18,7 @@ router.post("/withdraw/:cpf", FinanceMiddlewares.existeCpf, AccountController.wi
 
 router.get("/statementByDate/", FinanceMiddlewares.existeCpf, StatementController.statementByDate);
 
-router.put("/updatenameaccount/:cpf", FinanceMiddlewares.existeCpf, AccountController.updateName);
+router.put("/updateaccount/:cpf", FinanceMiddlewares.existeCpf, AccountController.updateAccount);
 
 router.get("/accountsget", AccountController.getAccount);
 
@@ -27,6 +29,8 @@ router.delete("/account/:cpf", FinanceMiddlewares.existeCpf, AccountController.d
 router.post("/accountP2P", FinanceMiddlewares.existeCpf, AccountController.transactionAccount);
 
 router.get("/accountsaldo/:cpf", FinanceMiddlewares.existeCpf, AccountController.getSaldo);
+
+router.post("/loginaccount", AccountController.loginAccount);
 
 
 // //Deve conter envio de algum documento referente a pessoa;

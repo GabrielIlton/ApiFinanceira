@@ -3,19 +3,24 @@ mongoose.connect('mongodb://localhost:27017/apiFinanceira');//*Conecta o mongoos
 const AccountModel = require('../models/account');//*Importa a collection de models
 const StatementModel = require('../models/statement');
 const TransactionModel = require('../models/transaction');
+// const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 class AccountController {//*É uma classe que tem todas a funcion de account
     async createAccount(req, res) {
        try{//*Testa realizar
-        const {name, cpf, endereco, telefone} = req.body;
+        const { name, cpf, endereco, telefone, email, password } = req.body;
 
         if(!name) throw 'Nome é obrigatório.';//*Verifica se nome exixte
         if(!cpf) throw 'CPF é obrigatório.';//*Verifica se cpf existe
         if(!endereco) throw 'Endereco é obrigatório.';//*Verifica se endereço existe
         if(!telefone) throw 'Telefone é obrigatório.';//*Verifica se telefone existe
+        if(!email) throw 'Email é obrigatório.';
+        if(!password) throw 'Senha é obrigatória.';
         
-        const account = await AccountModel.findOne({ cpf });//*Faz a pesquisa se cpf já existe
+        const account = await AccountModel.findOne({ cpf, email });//*Faz a pesquisa se cpf já existe
         if(account) throw 'CPF já cadastrado.' 
+        // if(email) throw 'Email já cadastrado.' 
         if(account){
             const accountCreated = await AccountModel.findOneAndUpdate({ cpf }, { deleted: false});
             return res.status(201).json({retorno: accountCreated});
@@ -23,17 +28,34 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         const retorno = await AccountModel.create({//*Instancia e cria no banco os dados
             name,
             cpf,
+            email,
+            password,
             endereco: {rua: endereco.rua, bairro: endereco.bairro, numero: endereco.numero},
             telefone
         });
 
         if(!retorno) throw 'Erro ao cadastrar.';
+        retorno.password = undefined;
 
         return res.status(201).json({retorno});
 
        }catch(error){//*Dá o erro se a tentativa falhar
            return res.status(422).json({error});    
        };
+    };
+
+    async loginAccount(req, res){
+        try {
+            const { email, password } = req.body;
+            const account = await AccountModel.findOne({ email });
+
+            if(!account) throw 'Conta não existe.';
+            const passwordCorrect = await bcrypt.compare(password, account.password);
+            if(!passwordCorrect) throw 'Senha incorreta.';
+            return res.status(200).json({ account });
+        } catch (error) {
+            return res.status(400).json({error});
+        }
     };
 
     async depositAccount (req, res) {
@@ -80,12 +102,18 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         }
     };
 
-    async updateName (req,res) {
+    async updateAccount (req,res) {
         try {
-            const { name } = req.body;//*Pega do corpo
             const { cpf } = req.params;//*Pega do parametro 
-            const account = await AccountModel.findOneAndUpdate({ cpf, deleted: false }, { name }, { new: true });//*Encontra o cpf não deletado e add um name novo
-            if(!account) throw 'Conta não existe.';//*Verifica se a conta exixte
+            const { name, password, email, passwordNew } = req.body;//*Pega do corpo
+            
+            const accountTest = await AccountModel.findOne({ email });
+            if(!accountTest) throw 'Conta não existe.';//*Verifica se a conta exixte
+            const passwordCorrect = await bcrypt.compare(password, accountTest.password);
+            if(!passwordCorrect) throw 'Senha incorreta.';
+            const passwordNewHash = await bcrypt.hash(passwordNew, 10);
+            const account = await AccountModel.findOneAndUpdate({cpf, deleted: false}, {password: passwordNewHash});//*Encontra o cpf não deletado e add um name novo
+            // account.password = undefined;
             return res.status(200).json({account});//*Retorna o status de sucesso
         } catch (error) {
             return res.status(400).json({error});//*Retorna o status de erro   
@@ -96,6 +124,8 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         try {
             const accounts = await AccountModel.find({}, {name:1, cpf:1});//*Primeiro parametro eh a pesquisa e o segundo vai mostrar
             if(!accounts) throw 'Conta não existe.';
+            accounts.password = undefined;
+
             return res.status(200).json({ accounts });
         }catch (error) {
             return res.status(400).json({message: error});   
