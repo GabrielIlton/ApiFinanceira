@@ -3,8 +3,9 @@ const router = Router();//*Importa a function router
 const AccountController = require('../controllers/AccountController');//*Importa os controllers
 const StatementController = require('../controllers/StatementController');
 const FinanceMiddlewares = require('../middlewares/FinanceMiddlewares');
-const bcrypt = require('bcryptjs');
-
+const Auth = require('../middlewares/Auth')
+// const authConfig = require('../config/auth.json');
+// const bcrypt = require('bcryptjs');
 
 //!SÃO TODAS AS ROTAS DA APLICATION
 
@@ -12,7 +13,7 @@ router.post("/account", AccountController.createAccount);
 
 router.get("/statement", StatementController.listStatement);
 
-router.post("/deposit/:cpf", FinanceMiddlewares.existeCpf, AccountController.depositAccount);
+router.post("/deposit/:cpf", Auth.userAuth, FinanceMiddlewares.existeCpf, AccountController.depositAccount);
 
 router.post("/withdraw/:cpf", FinanceMiddlewares.existeCpf, AccountController.withdrawAccount);
 

@@ -3,8 +3,14 @@ mongoose.connect('mongodb://localhost:27017/apiFinanceira');//*Conecta o mongoos
 const AccountModel = require('../models/account');//*Importa a collection de models
 const StatementModel = require('../models/statement');
 const TransactionModel = require('../models/transaction');
-// const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const authConfig = require('../config/auth');
+
+
+function generateToken (params){
+    return jwt.sign({params}, authConfig.secret, { expiresIn: 86400, } );
+};
 
 class AccountController {//*É uma classe que tem todas a funcion de account
     async createAccount(req, res) {
@@ -19,9 +25,11 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         if(!password) throw 'Senha é obrigatória.';
         
         const account = await AccountModel.findOne({ cpf, email });//*Faz a pesquisa se cpf já existe
-        if(account) throw 'CPF já cadastrado.' 
+        if(account)
+            return res.json({account, token: generateToken({id: account._id})});
+            
         // if(email) throw 'Email já cadastrado.' 
-        if(account){
+        if(account.deleted){
             const accountCreated = await AccountModel.findOneAndUpdate({ cpf }, { deleted: false});
             return res.status(201).json({retorno: accountCreated});
         };
@@ -37,22 +45,29 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         if(!retorno) throw 'Erro ao cadastrar.';
         retorno.password = undefined;
 
-        return res.status(201).json({retorno});
+        return res.status(201).json({ retorno, token: generateToken({id: retorno._id})});
 
        }catch(error){//*Dá o erro se a tentativa falhar
            return res.status(422).json({error});    
        };
     };
-
     async loginAccount(req, res){
         try {
             const { email, password } = req.body;
             const account = await AccountModel.findOne({ email });
-
             if(!account) throw 'Conta não existe.';
             const passwordCorrect = await bcrypt.compare(password, account.password);
             if(!passwordCorrect) throw 'Senha incorreta.';
-            return res.status(200).json({ account });
+            account.password = undefined;
+
+            const token = jwt.sign({ 
+                account_id: account._id
+            },
+            authConfig.secret
+            );
+
+            // const generateToken = generateToken({id: account._id})
+            return res.status(200).json({ account, token });
         } catch (error) {
             return res.status(400).json({error});
         }
@@ -60,6 +75,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
 
     async depositAccount (req, res) {
         try {
+            const accountId = res.auth.account_id;
             const{ cpf } = req.params;
             const { deposit } = req.body;//Desestruturação
             const account = await AccountModel.findOne({cpf, deleted: false});//*Faz a pesquisa se cpf já existe
@@ -105,16 +121,25 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async updateAccount (req,res) {
         try {
             const { cpf } = req.params;//*Pega do parametro 
-            const { name, password, email, passwordNew } = req.body;//*Pega do corpo
+            const { name, passwordOld, email, passwordNew } = req.body;//*Pega do corpo
             
-            const accountTest = await AccountModel.findOne({ email });
-            if(!accountTest) throw 'Conta não existe.';//*Verifica se a conta exixte
-            const passwordCorrect = await bcrypt.compare(password, accountTest.password);
-            if(!passwordCorrect) throw 'Senha incorreta.';
-            const passwordNewHash = await bcrypt.hash(passwordNew, 10);
-            const account = await AccountModel.findOneAndUpdate({cpf, deleted: false}, {password: passwordNewHash});//*Encontra o cpf não deletado e add um name novo
-            // account.password = undefined;
-            return res.status(200).json({account});//*Retorna o status de sucesso
+            const accountVerify = await AccountModel.findOne({ email ,passwordOld});
+            if(!accountVerify){
+                const passwordNewHash = await bcrypt.hash(passwordNew, 10);
+                const accountVerify = await AccountModel.findOneAndUpdate( {cpf}, { email , password: passwordNewHash});
+                return res.status(201).json({ accountVerify });
+            }else
+            {
+                const accountTest = await AccountModel.findOne({ email });
+                if(!accountTest) throw 'Conta não existe.';//*Verifica se a conta exixte
+                const passwordCorrect = await bcrypt.compare(passwordOld, accountTest.password);
+                if(passwordOld === passwordNew) throw 'A senha antiga é igual a digitada, para alterar digite uma diferente.';
+                if(!passwordCorrect) throw 'Senha incorreta.';
+                const passwordNewHash = await bcrypt.hash(passwordNew, 10);
+                const account = await AccountModel.findOneAndUpdate({cpf, deleted: false}, {password: passwordNewHash});//*Encontra o cpf não deletado e add um name novo
+                // account.password = undefined;
+                return res.status(200).json({account});//*Retorna o status de sucesso
+            }
         } catch (error) {
             return res.status(400).json({error});//*Retorna o status de erro   
         }
