@@ -2,12 +2,22 @@ const mongoose = require('mongoose');//*Importa o mongoose
 mongoose.connect('mongodb://localhost:27017/apiFinanceira');//*Conecta o mongoose com o mongodb
 const AccountModel = require('../models/account');//*Importa a collection de models
 const StatementModel = require('../models/statement');
-
+const authConfig = require('../config/auth');//*Importa o authConfig
 
 class StatementController {//*É uma classe que contem o estrato bancario 
-    async listStatement (req, res) {
+    async listAllStatement (req, res) {
         try {
             const statement = await StatementModel.find({});//*Encontra o ID do cpf em account e depois encontra o mesmo Id no statement
+            return res.status(200).json({ statement });
+          
+        } catch (error) {
+            return res.status(404).json({message: error.message});
+        };
+    };
+    async listOneAccountStatement (req, res) {
+        try {
+            const { id } = res.auth;
+            const statement = await StatementModel.find({ id: id.account_id });//*Encontra o ID do cpf em account e depois encontra o mesmo Id no statement
             return res.status(200).json({ statement });
           
         } catch (error) {
@@ -18,9 +28,9 @@ class StatementController {//*É uma classe que contem o estrato bancario
    async statementByDate (req, res) {     
         try {
             const { startDate, endDate } = req.query;
-            const { accountId } = res;
+            const { id } = res.auth;
             const condition = {
-                accountId,  created_at: {
+                accountId: id.account_id,  created_at: {
                     $gte: new Date(startDate),
                     $lte: new Date(endDate)
                 }

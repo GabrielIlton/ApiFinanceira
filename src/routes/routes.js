@@ -2,8 +2,8 @@ const { Router } = require('express');//*Importa o express
 const router = Router();//*Importa a function router
 const AccountController = require('../controllers/AccountController');//*Importa os controllers
 const StatementController = require('../controllers/StatementController');
-const FinanceMiddlewares = require('../middlewares/FinanceMiddlewares');
 const Auth = require('../middlewares/Auth')
+// const FinanceMiddlewares = require('../middlewares/FinanceMiddlewares');
 // const authConfig = require('../config/auth.json');
 // const bcrypt = require('bcryptjs');
 
@@ -11,7 +11,11 @@ const Auth = require('../middlewares/Auth')
 
 router.post("/account", AccountController.createAccount);
 
-router.get("/statement", Auth.userAuth, StatementController.listStatement);
+router.put("/retrieveaccount", AccountController.retrieveAccount);
+
+router.get("/statementall", StatementController.listAllStatement);
+
+router.get("/statementone", Auth.userAuth, StatementController.listOneAccountStatement);
 
 router.post("/deposit", Auth.userAuth, AccountController.depositAccount);
 
@@ -19,7 +23,7 @@ router.post("/withdraw", Auth.userAuth, AccountController.withdrawAccount);
 
 router.get("/statementByDate/", Auth.userAuth, StatementController.statementByDate);
 
-router.put("/updateaccount", Auth.userAuth, AccountController.updateAccount);
+router.put("/updateaccount", Auth.userAuth, AccountController.updatePasswordAccount);
 
 router.get("/accountsget", AccountController.getAccount);
 
