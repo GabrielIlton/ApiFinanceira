@@ -7,26 +7,18 @@ class AuthMiddlewares {//*É o middleware que verifica se exixte o CPF e faz o b
         try {
             const authHeader = req.headers.authorization;
             if(!authHeader) throw 'Token indefinido';
-
             const [, token] = authHeader.split(' ');
-            // const parts = authHeader.split(' ');
-            // if(!parts.lenght === 2) throw 'Token malformated';
-            // const [ scheme, token ] = parts;
-            // if(!/^Bearer$/i.test(scheme)) throw 'Token invalido';
-            // const verifyId = await jwt.verify(token, authConfig.secret) {
-            //     if (err) return res.status(401);
-            //     req.accountId = decoded.id
-            //     // next(); 
-            // }); 
-
             const verifyToken = await jwt.verify(token, AuthConfig.secret);
-            res.auth = verifyToken;
+            const verifyAccount = AccountModel.findOne({ id: verifyToken.account_id, deleted: false });
+            if(!verifyAccount) throw 'Conta não existe';
+            if(!verifyToken) throw 'Token inválido.';
+            res.auth = { id: verifyToken };
+
             next();
         } catch (error) {
             return res.status(400).json({error})
         } 
     }
 };
-
 //!MIDDLEWARE
 module.exports = new AuthMiddlewares();

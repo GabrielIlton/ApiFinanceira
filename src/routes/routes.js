@@ -11,25 +11,25 @@ const Auth = require('../middlewares/Auth')
 
 router.post("/account", AccountController.createAccount);
 
-router.get("/statement", StatementController.listStatement);
+router.get("/statement", Auth.userAuth, StatementController.listStatement);
 
-router.post("/deposit/:cpf", Auth.userAuth, FinanceMiddlewares.existeCpf, AccountController.depositAccount);
+router.post("/deposit", Auth.userAuth, AccountController.depositAccount);
 
-router.post("/withdraw/:cpf", FinanceMiddlewares.existeCpf, AccountController.withdrawAccount);
+router.post("/withdraw", Auth.userAuth, AccountController.withdrawAccount);
 
-router.get("/statementByDate/", FinanceMiddlewares.existeCpf, StatementController.statementByDate);
+router.get("/statementByDate/", Auth.userAuth, StatementController.statementByDate);
 
-router.put("/updateaccount/:cpf", FinanceMiddlewares.existeCpf, AccountController.updateAccount);
+router.put("/updateaccount", Auth.userAuth, AccountController.updateAccount);
 
 router.get("/accountsget", AccountController.getAccount);
 
-router.get("/accountdetails/:cpf", FinanceMiddlewares.existeCpf, AccountController.getAccountDetails);
+router.get("/accountdetails", Auth.userAuth, AccountController.getAccountDetails);
 
-router.delete("/account/:cpf", FinanceMiddlewares.existeCpf, AccountController.deleteAccount);
+router.delete("/deleteAccount", Auth.userAuth, AccountController.deleteAccount);
 
-router.post("/accountP2P", FinanceMiddlewares.existeCpf, AccountController.transactionAccount);
+router.post("/accountP2P", Auth.userAuth, AccountController.transactionAccount);
 
-router.get("/accountsaldo/:cpf", FinanceMiddlewares.existeCpf, AccountController.getSaldo);
+router.get("/accountsaldo", Auth.userAuth, AccountController.getSaldo);
 
 router.post("/loginaccount", AccountController.loginAccount);
 
