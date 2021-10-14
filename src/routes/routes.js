@@ -9,6 +9,15 @@ const Auth = require('../middlewares/Auth')
 
 //!SÃO TODAS AS ROTAS DA APLICATION
 
+/**
+ * @swagger
+ * /account:
+ *  post:
+ *      description: Create account 
+ *      responses:
+ *          '200':
+ *          description: Sucessfull response
+ */          
 router.post("/account", AccountController.createAccount);
 
 router.put("/retrieveaccount", AccountController.retrieveAccount);
@@ -25,13 +34,13 @@ router.get("/statementByDate/", Auth.userAuth, StatementController.statementByDa
 
 router.put("/updateaccount", Auth.userAuth, AccountController.updatePasswordAccount);
 
-router.get("/accountsget", AccountController.getAccount);
+router.get("/accountsget", AccountController.getAccounts);
 
 router.get("/accountdetails", Auth.userAuth, AccountController.getAccountDetails);
 
 router.delete("/deleteAccount", Auth.userAuth, AccountController.deleteAccount);
 
-router.post("/accountP2P", Auth.userAuth, AccountController.transactionAccount);
+router.post("/accountP2P", Auth.userAuth, AccountController.transactionAccounts);
 
 router.get("/accountsaldo", Auth.userAuth, AccountController.getSaldo);
 

@@ -1,0 +1,126 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Financeira",
+        "description": "Essa API fornece serviços bancários, como por exemplo, transferências bancárias.",
+        "termsOfService": "https://localhost:3333/terms",
+        "contact": {
+            "email": "gabriel.ilton@liveonsolutions.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3333",
+            "description": "API de test"
+        }
+    ],
+    "paths": {
+        "/account": {
+            "post": {
+                "summary": "Cadastro de usuário.",
+                "description": "Essa rota cria usuário no banco de dados",
+                "tags": ["User"],
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Account"
+                            },
+                            "examples": {
+                                "account": {
+                                    "value": {
+                                        "name": "Gabriel",
+                                        "cpf": 333,
+                                        "email": "gabriel@gmail.com",
+                                        "password": "333",
+                                        "endereco": {
+                                            "rua": "Kennedy",
+                                            "bairro": "Ferreira",
+                                            "numero": 56
+                                        },
+                                        "telefone": 333
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "Falha ao criar account."
+                    },
+                    "201": {
+                        "description": "Sucesso ao criar account.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/Account"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/retrieveaccount":{
+            "put":{
+                "description": "Recupera account deleted.",
+                "summary": "Recupera account deleted.",
+                "tags": ["User"],
+                "parameters": [
+                    {
+                        "cpf": "cpf",
+                        "in": "body",
+                        "description": "CPF para a busca",
+                        "required": true
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Account": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "cpf": {
+                        "type": "number"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "endereco": {
+                        "rua": {
+                            "type":"string"
+                        },
+                        "bairro":{
+                            "type":"string"
+                        },
+                        "numero": {
+                            "type":"number"
+                        }   
+                    },
+                    "telefone":{
+                        "type": "number"
+                    }
+                }
+            }
+        }
+    },
+    "securitySchemes": {
+        "bearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT"
+        }
+    }
+}

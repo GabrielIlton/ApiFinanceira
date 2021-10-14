@@ -123,7 +123,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         }
     };
 
-    async getAccount (req, res) {//*Busca all accounts
+    async getAccounts (req, res) {//*Busca all accounts
         try {            
             const accounts = await AccountModel.find({  }, {name:1, cpf:1});//*Primeiro parametro eh a pesquisa e o segundo vai mostrar
             if(!accounts) throw 'Conta não existe.';
@@ -145,7 +145,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         }
     };
 
-   async deleteAccount  (req, res) {//*Deleta account
+   async deleteAccount (req, res) {//*Deleta account
         try {
             const { id } = res.auth;
             const verifyDeletedAccount = await AccountModel.findOne({ idAccount: id.account_id, deleted: true });
@@ -158,7 +158,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         }
     };
 
-   async transactionAccount (req, res) {//*P2P
+   async transactionAccounts (req, res) {//*P2P
         try {
             const { cpfReciever, amount} = req.body;
             const { id } = res.auth;
