@@ -9,38 +9,11 @@ const swaggerDocs = require('../swagger.json')
 
 
 app.use(express.json());
-// const swaggerOptions = {
-//     swaggerDefinition: {
-//         info: {
-//             title: 'API Financeira',
-//             description: "System Bank Service",
-//             contact: {
-//                 name: "Joy"
-//             },
-//             servers: ["http://localhost:3333"]
-//         }
-//     },
-//     //['.routes/*.js]
-//     apis: ["server.js"]
-// };
 
-// const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-// app.use(routes);
 
-// /**
-//  * @swagger
-//  * /accounts:
-//  *  get:
-//  *      description: Create account 
-//  *      responses:
-//  *          '200':
-//  *          description: Sucessfull response
-//  */ 
-app.get('/accounts', (req, res) => {
-    res.status(200).send("Sucessfull");
-});
-
+app.use(routes);
+ 
 app.listen(3333,() => {//?Eh a porta que está rodando no navegador
     console.log("Rodando")
 });

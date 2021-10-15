@@ -21,7 +21,6 @@
                 "summary": "Cadastro de usuário.",
                 "description": "Essa rota cria usuário no banco de dados",
                 "tags": ["User"],
-                "security": [{ "bearerAuth": [] }],
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -55,9 +54,21 @@
                         "description": "Sucesso ao criar account.",
                         "content": {
                             "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "$ref": "#/components/schemas/Account"
+                                "examples": {
+                                    "account": {
+                                        "value": {
+                                            "name": "Nome do usuário",
+                                            "cpf":"CPF do usuario",
+                                            "email": "Email do usuario",
+                                            "password": "Senha do usuario",
+                                            "endereco": {
+                                                "rua": "Rua onde mora o usuario",
+                                                "bairro": "Bairro onde o usuario mora",
+                                                "numero": "Numero da casa do usuario"
+                                            },
+                                            "telefone": "Telefone do usuario com o DDD"
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -65,19 +76,268 @@
                 }
             }
         },
+
         "/retrieveaccount":{
             "put":{
                 "description": "Recupera account deleted.",
                 "summary": "Recupera account deleted.",
                 "tags": ["User"],
-                "parameters": [
-                    {
-                        "cpf": "cpf",
-                        "in": "body",
-                        "description": "CPF para a busca",
-                        "required": true
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RetrieveAccount"
+                            },
+                            "examples": {
+                                "retrieveaccount": {
+                                    "value": {
+                                        "cpf": 22
+                                    }
+                                }
+                            }
+                        }
+                    }  
+                },
+                "responses": {
+                    "400": {
+                        "description": "Account deleted false."
+                    },
+                    "201": {
+                        "description": "Sucesso ao recuperar account.",
+                        "content": {
+                            "application/json": {
+                                "examples":{
+                                    "retrieveaccount": {
+                                        "value": {
+                                            "cpf":"CPF do usuario caso tenha sido deletado"
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
-                ]
+                }
+            }
+        },
+
+        "/statementall": {
+            "get": {
+                "tags": ["Statement"],
+                "description": "Busca o estrato de todas accounts",
+                "summary": "Busca o estrato de todas accounts",
+                "responses": {
+                    "400": {
+                        "description": "Account deleted false."
+                    },
+                    "201": {
+                        "description": "Sucesso ao recuperar account.",
+                        "content": {
+                            "application/json": {
+                                "examples":{
+                                    "statementall": {
+                                        "value": {
+                                            "_id": "Retorna o Id de gravação da transação no banco",
+                                            "amount": "Retorna o value da transação",
+                                            "type": "Retorna o type da transação",
+                                            "accountId": "Retorna o Id de Account de statement",
+                                            "created_at": "Retorna a data de criação",
+                                            "updated_at": "Retorna a data de atualização"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/statementone": {
+            "get": {
+                "tags": ["Statement"],
+                "description": "Busca o estrato de uma account",
+                "summary": "Busca o estrato de uma account",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "404":{
+                        "description": "Falha ao resgatar seu statement."
+                    },
+                    "200": {
+                        "description": "Sucesso",
+                        "content": {
+                            "application/json": {
+                                "examples":{
+                                    "statementone": {
+                                        "value": {
+                                            "_id": "Retorna o Id de gravação da transação no banco",
+                                            "amount": "Retorna o value da transação",
+                                            "type": "Retorna o tipo da transação",
+                                            "accountId": "Retorna o Id de paenas one Account de statement",
+                                            "created_at": "Retorna a data de criação",
+                                            "updated_at": "Retorna a data de atualização"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/deposit": {
+            "post": {
+                "tags": ["Statement"],
+                "description": "Realiza o depósito em apenas uma account",
+                "summary": "Realiza o depósito em apenas uma account",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Deposit"
+                            },
+                            "examples": {
+                                "account": {
+                                    "value": {
+                                        "deposit": 300 
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "404":{
+                        "description": "Falha ao realizar seu deposito."
+                    },
+                    "200": {
+                        "description": "Sucesso",
+                        "content": {
+                            "application/json": {
+                                "examples":{
+                                    "statementone": {
+                                        "value": {
+                                            "name": "Retorna o name da conta depositada",
+                                            "total": "Retorna o saldp da total conta depositada"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/withdraw": {
+            "post": {
+                "tags": ["Statement"],
+                "description": "Realiza o depósito em apenas uma account",
+                "summary": "Realiza o depósito em apenas uma account",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Deposit"
+                            },
+                            "examples": {
+                                "account": {
+                                    "value": {
+                                        "withDraw": 300 
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "404":{
+                        "description": "Falha ao realizar seu deposito."
+                    },
+                    "200": {
+                        "description": "Sucesso",
+                        "content": {
+                            "application/json": {
+                                "examples":{
+                                    "statementone": {
+                                        "value": {
+                                            "name": "Retorna o name da conta",
+                                            "total": "Retorna o saldo total da conta após o saque"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/statementByDate": {
+            "get": {
+                "description": "Busca o estrato por data de uma conta única",
+                "summary": "Busca o estrato por data de uma conta única",
+                "tags": ["Statement"],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestParams":{
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/statementByDate"
+                            },
+                            "examples": {
+                                "statementByDate": {
+                                    "value": {
+                                        "startDate": "2021-10-15",
+                                        "endtDate": "2021-12-30"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "Estrato não encontrado."
+                    },
+                    "201": {
+                        "description": "Sucesso ao recuperar estrato por data.",
+                        "content": {
+                            "application/json": {
+                                "examples":{
+                                    "statement": {
+                                        "value": {
+                                            "_id": "Retorna o Id da conta",
+                                            "amount": "Retorna o value da transação",
+                                            "type": "Retorna o type da transação",
+                                            "accountId": "Retorna o Id da conta de statement",
+                                            "created_at": "Retorna a data de criação",
+                                            "updated_at": "Retorna a data de atualização"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     },
@@ -113,14 +373,58 @@
                         "type": "number"
                     }
                 }
+            },
+            "RetrieveAccount": {
+                "type": "object",
+                "properties": {
+                    "cpf": {
+                        "type": "number"
+                    }
+                }
+            },
+            "StatementAll": {
+                "type": "object",
+                "properties": {
+                    "_id": "string"
+                }
+            },
+            "StatementOne": {
+                "schema": {
+                    "Statement":{
+                        "type": "object",
+                        "properties": {
+                            "accountId": "string"
+                        }
+                    }
+                }
+            },
+            "Deposit": {
+                "schema": {
+                    "Deposit":{
+                        "type": "object",
+                        "properties": {
+                            "balance": "number"
+                        }
+                    }
+                }
+            },
+            "StatementByDate": {
+                "schema": {
+                    "":{
+                        "type": "object",
+                        "properties": {
+                            "": "number"
+                        }
+                    }
+                }
             }
-        }
-    },
-    "securitySchemes": {
-        "bearerAuth": {
-            "type": "http",
-            "scheme": "bearer",
-            "bearerFormat": "JWT"
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
         }
     }
 }

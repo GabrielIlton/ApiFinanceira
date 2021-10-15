@@ -17,7 +17,7 @@ class StatementController {//*É uma classe que contem o estrato bancario
     async listOneAccountStatement (req, res) {
         try {
             const { id } = res.auth;
-            const statement = await StatementModel.find({ id: id.account_id });//*Encontra o ID do cpf em account e depois encontra o mesmo Id no statement
+            const statement = await StatementModel.find({ accountId: id.account_id });//*Encontra o ID do cpf em account e depois encontra o mesmo Id no statement
             return res.status(200).json({ statement });
           
         } catch (error) {
