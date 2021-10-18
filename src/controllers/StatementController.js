@@ -14,6 +14,7 @@ class StatementController {//*É uma classe que contem o estrato bancario
             return res.status(404).json({message: error.message});
         };
     };
+    
     async listOneAccountStatement (req, res) {
         try {
             const { id } = res.auth;

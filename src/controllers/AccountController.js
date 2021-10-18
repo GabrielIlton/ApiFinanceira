@@ -14,11 +14,17 @@ class AccountController {//*É uma classe que tem todas a funcion de account
 
         if(!name) throw 'Nome é obrigatório.';//*Verifica se nome exixte
         if(!cpf) throw 'CPF é obrigatório.';//*Verifica se cpf existe
+        if(String(cpf).length != 11) throw 'CPF deve ser igual a 11 caracteres.';//*Verifica se cpf existe
         if(!endereco) throw 'Endereco é obrigatório.';//*Verifica se endereço existe
-        if(!telefone) throw 'Telefone é obrigatório.';//*Verifica se telefone existe
+        if(!telefone) throw 'Número de telefone é obrigatório juntamente com o DDD.';//*Verifica se telefone existe
+        if(String(telefone).length != 11) throw 'A quantidade de números de telefone deve ser igual a 11.';//*Verifica se telefone existe
         if(!email) throw 'Email é obrigatório.';//*Verifica se email existe
+        if(!email.indexOf('@')) throw 'Email deve ter uma estrutura adequada.';//*Verifica se email existe 
+        //!validar o email corretamente
         if(!password) throw 'Senha é obrigatória.';//*Verifica se senha existe
-
+        if(password.length < 4 ) throw 'Senha deve conter mais de 4 caracteres.';//*Verifica se senha existe
+        
+        const nameFirstUpper = name[0].toUpperCase() + name.substring(1);
         const accountVerifyCpf = await AccountModel.findOne({ cpf });//*Faz a pesquisa se cpf já existe
         const accountVerifyEmail = await AccountModel.findOne({ email });//*Faz a pesquisa se email já existe
         
@@ -26,7 +32,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
             return res.json({ message: 'CPF ou email já existente.' });//*Retorna o erro caso já exista CPF  ou email
         };
         const accountCreated = await AccountModel.create({//*Requere e cria no banco os dados
-            name,
+            nameFirstUpper,
             cpf,
             email,
             password,
@@ -67,11 +73,10 @@ class AccountController {//*É uma classe que tem todas a funcion de account
             account.password = undefined;
 
             const token = jwt.sign({//*Gera o token com o ID de account 
-                account_id: account._id
+                account_id: account._id,
             },
-                authConfig.secret,
-            
-            );
+                authConfig.expires
+            );//!token precisa exprirar
             return res.status(200).json({ name: account.name, token });
         } catch (error) {
             return res.status(400).json({ error });
