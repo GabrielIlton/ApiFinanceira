@@ -9,7 +9,7 @@ const Auth = require('../middlewares/Auth')
 
 //!SÃO TODAS AS ROTAS DA APLICATION
       
-router.post("/account", AccountController.createAccount);
+router.post("/createaccount", AccountController.createAccount);
 
 router.put("/retrieveaccount", AccountController.retrieveAccount);
 
@@ -23,7 +23,7 @@ router.post("/withdraw", Auth.userAuth, AccountController.withdrawAccount);
 
 router.get("/statementByDate", Auth.userAuth, StatementController.statementByDate);
 
-router.put("/updateaccount", Auth.userAuth, AccountController.updatePasswordAccount);
+router.put("/updatepasswordaccount", Auth.userAuth, AccountController.updatePasswordAccount);
 
 router.get("/accountsget", AccountController.getAccounts);
 
@@ -31,7 +31,7 @@ router.get("/accountdetails", Auth.userAuth, AccountController.getAccountDetails
 
 router.delete("/deleteAccount", Auth.userAuth, AccountController.deleteAccount);
 
-router.post("/accountP2P", Auth.userAuth, AccountController.transactionAccounts);
+router.post("/accountP2P", Auth.userAuth, AccountController.P2P);
 
 router.get("/accountsaldo", Auth.userAuth, AccountController.getSaldo);
 

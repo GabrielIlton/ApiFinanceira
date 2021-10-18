@@ -79,8 +79,8 @@
 
         "/retrieveaccount":{
             "put":{
-                "description": "Recupera account deleted.",
-                "summary": "Recupera account deleted.",
+                "description": "Recupera a conta deleteda.",
+                "summary": "Recupera a conta deleteda.",
                 "tags": ["User"],
                 "requestBody": {
                     "content": {
@@ -273,7 +273,7 @@
                         "content": {
                             "application/json": {
                                 "examples":{
-                                    "statementone": {
+                                    "withdraw": {
                                         "value": {
                                             "name": "Retorna o name da conta",
                                             "total": "Retorna o saldo total da conta após o saque"
@@ -297,23 +297,18 @@
                         "bearerAuth": []
                     }
                 ],
-                "requestParams":{
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/statementByDate"
-                            },
-                            "examples": {
-                                "statementByDate": {
-                                    "value": {
-                                        "startDate": "2021-10-15",
-                                        "endtDate": "2021-12-30"
-                                    }
-                                }
-                            }
-                        }
+                "parameters": [
+                    {
+                    "name": "startDate",
+                        "in": "query",
+                        "description": "Data inicial para buscar o estrato"
+                    },
+                    {
+                        "name": "endDate",
+                        "in": "query",
+                        "description": "Data final para buscar o estrato"
                     }
-                },
+                ],
                 "responses": {
                     "400": {
                         "description": "Estrato não encontrado."
@@ -326,8 +321,8 @@
                                     "statement": {
                                         "value": {
                                             "_id": "Retorna o Id da conta",
-                                            "amount": "Retorna o value da transação",
-                                            "type": "Retorna o type da transação",
+                                            "amount": "Retorna o valor da transação",
+                                            "type": "Retorna o tipo da transação",
                                             "accountId": "Retorna o Id da conta de statement",
                                             "created_at": "Retorna a data de criação",
                                             "updated_at": "Retorna a data de atualização"
@@ -339,92 +334,405 @@
                     }
                 }
             }
-        }
-    },
-    "components": {
-        "schemas": {
-            "Account": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "cpf": {
-                        "type": "number"
-                    },
-                    "email": {
-                        "type": "string"
-                    },
-                    "password": {
-                        "type": "string"
-                    },
-                    "endereco": {
-                        "rua": {
-                            "type":"string"
-                        },
-                        "bairro":{
-                            "type":"string"
-                        },
-                        "numero": {
-                            "type":"number"
-                        }   
-                    },
-                    "telefone":{
-                        "type": "number"
+        },
+
+        "/updatepasswordaccount":{
+            "put":{
+                "description": "Atualiza a senha da conta que exista.",
+                "summary": "Atualiza a senha da conta que exista.",
+                "tags": ["User"],
+                "security": [
+                    {
+                        "bearerAuth": []
                     }
-                }
-            },
-            "RetrieveAccount": {
-                "type": "object",
-                "properties": {
-                    "cpf": {
-                        "type": "number"
-                    }
-                }
-            },
-            "StatementAll": {
-                "type": "object",
-                "properties": {
-                    "_id": "string"
-                }
-            },
-            "StatementOne": {
-                "schema": {
-                    "Statement":{
-                        "type": "object",
-                        "properties": {
-                            "accountId": "string"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdatePasswordAccount"
+                            },
+                            "examples": {
+                                "updatepasswordaccount": {
+                                    "value": {
+                                        "passwordOld": "22",
+                                        "email": "anjo@gmail.com",
+                                        "passwordNew": "222"
+                                    }
+                                }
+                            }
                         }
-                    }
-                }
-            },
-            "Deposit": {
-                "schema": {
-                    "Deposit":{
-                        "type": "object",
-                        "properties": {
-                            "balance": "number"
-                        }
-                    }
-                }
-            },
-            "StatementByDate": {
-                "schema": {
-                    "":{
-                        "type": "object",
-                        "properties": {
-                            "": "number"
+                    }  
+                },
+                "responses": {
+                    "400": {
+                        "description": "Não foi possível alterar senha."
+                    },
+                    "201": {
+                        "description": "Sucesso ao alterar senha da conta.",
+                        "content": {
+                            "application/json": {
+                                "examples":{
+                                    "updatepasswordaccount": {
+                                        "value": {
+                                            "nome":"Nome do usuario que teve a senha alterada.",
+                                            "cpf":"CPF do usuario que teve a senha alterada.",
+                                            "email":"Email do usuario que teve a senha alterada.",
+                                            "message": "Senha alterada com sucesso."
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
         },
-        "securitySchemes": {
-            "bearerAuth": {
-                "type": "http",
-                "scheme": "bearer",
-                "bearerFormat": "JWT"
+
+        "/accountsget":{
+            "get": {
+                "tags": ["User"],
+                "description": "Busca todas as contas.",
+                "summary": "Busca todas as contas cadastradas no banco.",
+                "responses": {
+                    "404":{
+                        "description": "Falha ao resgatar as contas."
+                    },
+                    "200": {
+                        "description": "Sucesso",
+                        "content": {
+                            "application/json": {
+                                "examples":{
+                                    "statementone": {
+                                        "value": {
+                                            "_id": "Retorna o Id da conta.",
+                                            "name": "Retorna o nome da conta.",
+                                            "cpf": "Retorna o CPF da conta."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/accountdetails":{
+            "get": {
+                "tags": ["User"],
+                "description": "Busca os detalhes da conta.",
+                "summary": "Busca os detalhes de uma única conta cadastrada no banco.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "404":{
+                        "description": "Falha ao resgatar detalhes da conta."
+                    },
+                    "200": {
+                        "description": "Sucesso ao resgatar os detalhes da conta",
+                        "content": {
+                            "application/json": {
+                                "examples":{
+                                    "statementone": {
+                                        "value": {
+                                            "_id": "Retorna o Id da conta salva no banco.",
+                                            "name": "Retorna o nome da conta salva no banco.",
+                                            "cpf": "Retorna o CPF da conta.",
+                                            "email": "Retorna o email da conta.",
+                                            "password": "Retorna a senha da conta encriptada.",
+                                            "endereco": {
+                                                "rua": "Retorna a rua cadastrada no endereco da cont.a.",
+                                                "bairro": "Retorna o bairro cadastrado no endereco da conta.",
+                                                "numero": "Retorna o numero cadastrado no endereco da conta.",
+                                                "_id": "Retorna o identificador de cadastro do objeto que no caso eh o endereço."
+                                            },
+                                            "telefone": "Retorna o telefone da conta salva no banco.",
+                                            "deleted": "Retorna se está deletado ou não no banco.",
+                                            "balance": "Retorna o saldo da conta."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/deleteaccount": {
+            "delete": {
+                "tags": ["User"],
+                "description": "'Deleta' a conta no banco.",
+                "summary": "'Deleta' a conta cadastrada no banco como 'deleted: true'.",
+                "security": [
+                    {
+                        "bearerAuth": [] 
+                    }
+                ],
+                "responses": {
+                    "404":{
+                        "description": "Falha ao deletar a conta."
+                    },
+                    "200": {
+                        "description": "Sucesso ao deletar a conta",
+                        "content": {
+                            "application/json": {
+                                "examples":{
+                                    "deleteAccount": {
+                                        "value": {
+                                            "deleted": "Retorna o nome da conta deletada.",
+                                            "message": "Retorna a informação de deletado com sucesso."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/accountP2P": {
+            "post": {
+                "tags": ["Statement"],
+                "description": "Realiza a transação de uma conta para outra, subtraindo o saldo na conta de envio e adicionando no saldo da conta que recebe.",
+                "summary": "Realiza a transação.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AccountP2P"
+                            },
+                            "examples": {
+                                "accountP2P": {
+                                    "value": {
+                                        "cpfReciever": 4444,
+                                        "amount": 200
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "404":{
+                        "description": "Falha ao realizar a transação."
+                    },
+                    "200": {
+                        "description": "Sucesso na transferência.",
+                        "content": {
+                            "application/json": {
+                                "examples":{
+                                    "deleteAccount": {
+                                        "value": {
+                                            "accountSend": "Nome da conta que está realizando a transferência.",
+                                            "cashout": "Valor que está saindo da conta de 'accountSend'.",
+                                            "saldo": "Saldo da conta do enviador após a transação.",
+                                            "accountReciever": "Nome da conta que está recebendo a transferência.",
+                                            "cashin": "Valor que está entrando na conta do 'accountReciever'."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/accountsaldo": {
+            "get": {
+                "tags": ["User"],
+                "description": "Recupera o saldo da conta chamada pelo token no headers",
+                "summary": "Recupera o saldo da conta chamada pelo token no headers",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "404":{
+                        "description": "Falha ao recuperar o saldo da conta."
+                    },
+                    "200": {
+                        "description": "Sucesso ao recuperar o saldo da conta.",
+                        "content": {
+                            "application/json": {
+                                "examples":{
+                                    "getAccount": {
+                                        "value": {
+                                            "nameAccount": "Nome da conta que está sendo recuperado o saldo.",
+                                            "saldoAccount": "Retorna o saldo da conta."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/loginAccount": {
+            "post": {
+                "tags": ["User"],
+                "description": "Realiza o login da conta já criada no banco.",
+                "summary": "Realiza o login na conta com email e senha que existe já foi criada na rota '/createdaccount'.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginAccount"
+                            },
+                            "examples": {
+                                "loginAccount": {
+                                    "value": {
+                                        "email": "anjo@gmail.com",
+                                        "password": "22"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "404":{
+                        "description": "Falha ao realizar o login."
+                    },
+                    "200": {
+                        "description": "Sucesso ao logar.",
+                        "content": {
+                            "application/json": {
+                                "examples":{
+                                    "LoginAccount": {
+                                        "value": {
+                                            "name": "Nome da conta que foi logada/acessada.",
+                                            "token": "Retorna o token que será utilizado nas rotas de autenticação."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }        
+        },
+
+        "components": {
+            "schemas": {
+                "Account": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "cpf": {
+                            "type": "number"
+                        },
+                        "email": {
+                            "type": "string"
+                        },
+                        "password": {
+                            "type": "string"
+                        },
+                        "endereco": {
+                            "rua": {
+                                "type":"string"
+                            },
+                            "bairro":{
+                                "type":"string"
+                            },
+                            "numero": {
+                                "type":"number"
+                            }   
+                        },
+                        "telefone":{
+                            "type": "number"
+                        }
+                    }
+                },
+                "RetrieveAccount": {
+                    "type": "object",
+                    "properties": {
+                        "cpf": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "Deposit": {
+                    "type": "object",
+                    "properties": {
+                        "deposit": {
+                            "type": "number"
+                        } 
+                    }
+                },
+                "Withdraw": {
+                    "type": "object",
+                    "properties": {
+                        "withdraw": {
+                            "type": "number"
+                        } 
+                    }
+                },
+                "UpdatePasswordAccount": {
+                    "type": "object",
+                    "properties": {
+                        "passwordOld": {
+                            "type": "string"
+                        },
+                        "email": {
+                            "type": "string"
+                        },
+                        "passwordNew": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "AccountP2P": {
+                    "type": "object",
+                    "properties": {
+                        "cpfReciever": {
+                            "type": "number"
+                        },
+                        "amount": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "LoginAccount": {
+                    "type": "object",
+                    "properties": {
+                        "email": {
+                            "type": "string"
+                        },
+                        "password": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "securitySchemes": {
+                "bearerAuth": {
+                    "type": "http",
+                    "scheme": "bearer",
+                    "bearerFormat": "JWT"
+                }
             }
         }
-    }
+    }   
 }

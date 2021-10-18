@@ -72,7 +72,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
                 authConfig.secret,
             
             );
-            return res.status(200).json({ account, token });
+            return res.status(200).json({ name: account.name, token });
         } catch (error) {
             return res.status(400).json({ error });
         }
@@ -158,7 +158,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         }
     };
 
-   async transactionAccounts (req, res) {//*P2P
+   async P2P (req, res) {//*P2P
         try {
             const { cpfReciever, amount} = req.body;
             const { id } = res.auth;
@@ -197,7 +197,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
                 accountId: accountReciever._id
             });
             
-            return res.status(201).json({ name: accountSend.name, saldo: accountSend.balance - amount });
+            return res.status(201).json({ accountSend: accountSend.name, cashoutAccountSend: amount, saldoAccountSend: accountSend.balance - amount, accountReciever: accountReciever.name, cashinAccounrReciever: amount});
         
         } catch (error) {
             return res.status(400).json({message: error});//?Retorna o status
@@ -219,12 +219,12 @@ class AccountController {//*É uma classe que tem todas a funcion de account
             }
             else{               
                 const passwordCorrect = await bcrypt.compare(passwordOld, accountVerify.password);
-                if(passwordOld === passwordNew) throw 'A senha antiga é igual a digitada, para alterar digite uma diferente.';
+                if(passwordOld === passwordNew) throw 'A senha antiga é igual a digitada, para alterar, digite uma diferente.';
                 if(!passwordCorrect) throw 'Senha incorreta.';
                 const passwordNewHash = await bcrypt.hash(passwordNew, 10);
                 const account = await AccountModel.findOneAndUpdate({_id: id.account_id, deleted: false}, {password: passwordNewHash});//*Encontra o cpf não deletado e add um name novo
                 account.password = undefined;
-                return res.status(200).json({account});//*Retorna o status de sucesso
+                return res.status(200).json({name: account.name, cpf: account.cpf, email: account.email, message: "Senha alterada com sucesso."});//*Retorna o status de sucesso
             }
         } catch (error) {
             return res.status(400).json({error});//*Retorna o status de erro   
@@ -236,7 +236,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
             const { id } = res.auth;
             const account = await AccountModel.findOne({ _id: id.account_id, deleted: false });
             if(!account) throw 'Conta não existe.';
-            return res.status(200).json({ Nome: account.name, Saldo: account.balance });
+            return res.status(200).json({ AccountNome: account.name, AccountSaldo: account.balance });
           
         } catch (error) {
             return res.status(404).json({message: error});

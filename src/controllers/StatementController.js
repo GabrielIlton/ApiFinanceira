@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');//*Importa o mongoose
 mongoose.connect('mongodb://localhost:27017/apiFinanceira');//*Conecta o mongoose com o mongodb
-const AccountModel = require('../models/account');//*Importa a collection de models
 const StatementModel = require('../models/statement');
-const authConfig = require('../config/auth');//*Importa o authConfig
+// const AccountModel = require('../models/account');//*Importa a collection de models
+// const authConfig = require('../config/auth');//*Importa o authConfig
 
 class StatementController {//*É uma classe que contem o estrato bancario 
     async listAllStatement (req, res) {
@@ -36,10 +36,11 @@ class StatementController {//*É uma classe que contem o estrato bancario
                 }
             }; 
             const statement = await StatementModel.find(condition);//*Encontra o ID do cpf em account e depois encontra o mesmo Id no statement    
+            if(statement.length === 0) throw "Não há nenhuma transação nesse período de tempo."
             return res.status(200).json({statement});
             
         } catch (error) {
-            return res.status(404).json({message: error.message});
+            return res.status(404).json({message: error});
         };
     };
 }
