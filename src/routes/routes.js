@@ -9,33 +9,35 @@ const Auth = require('../middlewares/Auth')
 
 //!SÃO TODAS AS ROTAS DA APLICATION
       
-router.post("/createaccount", AccountController.createAccount);
+router.post("/create", AccountController.createAccount);
 
-router.put("/retrieveaccount", AccountController.retrieveAccount);
+router.post("/login", AccountController.loginAccount);
 
-router.get("/statementall", StatementController.listAllStatement);
+router.get("/details", Auth.userAuth, AccountController.getAccountDetails);
 
-router.get("/statementone", Auth.userAuth, StatementController.listOneAccountStatement);
+router.get("/balance", Auth.userAuth, AccountController.getSaldo);
+
+router.get("/accounts/list", Auth.userAuth, AccountController.getAccounts);
+
+router.put("/password", Auth.userAuth, AccountController.updatePasswordAccount);
+
+router.delete("/delete", Auth.userAuth, AccountController.deleteAccount);
+
+router.put("/retrieve", AccountController.retrieveAccount);
+
+router.get("/statement", Auth.userAuth, StatementController.listOneAccountStatement);
+
+router.get("/statementByDate", Auth.userAuth, StatementController.statementByDate);
+
+router.get("/statement/list", Auth.userAuth, StatementController.listAllStatement);
 
 router.post("/deposit", Auth.userAuth, AccountController.depositAccount);
 
 router.post("/withdraw", Auth.userAuth, AccountController.withdrawAccount);
 
-router.get("/statementByDate", Auth.userAuth, StatementController.statementByDate);
+router.post("/P2P", Auth.userAuth, AccountController.P2P);
 
-router.put("/updatepasswordaccount", Auth.userAuth, AccountController.updatePasswordAccount);
 
-router.get("/accountsget", AccountController.getAccounts);
-
-router.get("/accountdetails", Auth.userAuth, AccountController.getAccountDetails);
-
-router.delete("/deleteAccount", Auth.userAuth, AccountController.deleteAccount);
-
-router.post("/accountP2P", Auth.userAuth, AccountController.P2P);
-
-router.get("/accountsaldo", Auth.userAuth, AccountController.getSaldo);
-
-router.post("/loginaccount", AccountController.loginAccount);
 
 module.exports = router;//*Exporta as rotas
 

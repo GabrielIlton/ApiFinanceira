@@ -36,7 +36,12 @@ const AccountSchema = new Schema({
      balance: {
           type: Number,
           default: 0
-     }    
+     },
+     admin: {
+          type: Boolean,
+          default: false,
+          required: false
+     }   
 });
 
 AccountSchema.pre('save', async function(next){
