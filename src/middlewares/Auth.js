@@ -12,7 +12,7 @@ class AuthMiddlewares {//*É o middleware que verifica se exixte o CPF e faz o b
             const verifyAccount = AccountModel.findOne({ id: verifyToken.account_id, deleted: false });
             if(!verifyAccount) throw 'Conta não existe';
             if(!verifyToken) throw 'Token inválido.';
-            res.auth = { id: verifyToken };
+            res.auth = { token: verifyToken };
 
             next();
         } catch (error) {

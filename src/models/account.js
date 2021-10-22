@@ -41,13 +41,19 @@ const AccountSchema = new Schema({
           type: Boolean,
           default: false,
           required: false
-     }   
+     },
+     image: {
+          name: String,
+          size: Number,
+          key: String,
+          url: String,
+          default: false
+     },
 });
 
 AccountSchema.pre('save', async function(next){
      const hash = await bcrypt.hash(this.password, 10);
      this.password = hash;     
-
      next();
 });
 
