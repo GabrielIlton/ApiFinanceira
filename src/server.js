@@ -7,16 +7,17 @@ mongoose.connect('mongodb://localhost:27017/apiFinanceira', {
 const swaggerUi = require('swagger-ui-express'); 
 const swaggerDocs = require('../swagger.json')
 const morgan = require('morgan');
+const path = require('path');
+
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
-
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
+app.use('/image', express.static(path.resolve(__dirname, "..", "tmp")));//!
 app.use(routes);
- 
+
 app.listen(3333,() => {//?Eh a porta que está rodando no navegador
     console.log("Rodando")
 });

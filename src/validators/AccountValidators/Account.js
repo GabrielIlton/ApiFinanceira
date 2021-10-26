@@ -36,7 +36,7 @@ class AccountValidator {
     };
 
     async withdrawAccountValidator(body) {
-        if(!body.withdraw) throw 'O valor do saque é obrigatório.';
+        if(body.withdraw < 1) throw 'O valor do saque é obrigatório.';
     };
 
     async P2PValidator(body){

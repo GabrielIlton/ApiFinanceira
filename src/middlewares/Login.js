@@ -1,6 +1,4 @@
 const AccountModel = require('../models/account');
-const jwt = require('jsonwebtoken');
-const AuthConfig = require('../config/auth');
 const bcrypt = require('bcryptjs');//*Importa o bcryptjs
 
 class AuthMiddlewares {//*É o middleware que verifica se exixte o CPF e faz o balanço da conta geral

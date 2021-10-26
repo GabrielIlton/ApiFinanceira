@@ -39,7 +39,8 @@
                                             "bairro": "Ferreira",
                                             "numero": 56
                                         },
-                                        "telefone": 333
+                                        "telefone": 333,
+                                        "admin": "true"
                                     }
                                 }
                             }
@@ -667,6 +668,9 @@
                     },
                     "telefone":{
                         "type": "number"
+                    },
+                    "admin": {
+                        "type": "boolean"
                     }
                 }
             },

@@ -2,6 +2,7 @@ const { Router } = require('express');//*Importa o express
 const router = Router();//*Importa a function router
 const AccountController = require('../controllers/AccountController');//*Importa os controllers
 const StatementController = require('../controllers/StatementController');
+const UploadImage = require('../controllers/UploadImageController');
 const Auth = require('../middlewares/Auth');
 const Login = require('../middlewares/Login');
 const multer = require('multer');
@@ -24,7 +25,9 @@ router.get("/accounts/list", Auth.userAuth, AccountController.getAccounts);
 
 router.put("/password", Auth.userAuth, AccountController.updatePasswordAccount);
 
-router.post("/image", Auth.userAuth, multer(multerConfig).single('file'), AccountController.uploadImage);//!Fazer funcionar
+router.post("/image", Auth.userAuth, multer(multerConfig).single('file'), UploadImage.uploadImage);//!Fazer funcionar
+
+router.delete("/image", Auth.userAuth, UploadImage.deleteImage);//!Fazer funcionar
 
 router.delete("/delete", Auth.userAuth, AccountController.deleteAccount);
 

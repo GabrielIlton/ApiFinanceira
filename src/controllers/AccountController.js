@@ -7,11 +7,12 @@ const jwt = require('jsonwebtoken');//*Importa o jsonwebtoken
 const bcrypt = require('bcryptjs');//*Importa o bcryptjs
 const authConfig = require('../config/auth');//*Importa o authConfig
 const AccountValidator = require('../validators/AccountValidators/Account');
-const multerConfig = require('../config/multer');
+// const multerConfig = require('../config/multer');
 
 
 class AccountController {//*É uma classe que tem todas a funcion de account
-    async createAccount(req, res) {//*Create account
+    //! ADD Documentation
+    async createAccount(req, res) {//*Create account 
         try {
             const { name , cpf, endereco, telefone, email, password, admin } = req.body;//*Pega os dados do body da requisição
             
@@ -28,7 +29,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
                 password,
                 endereco: {rua: endereco.rua, bairro: endereco.bairro, numero: endereco.numero},//*Cria um objeto no banco
                 telefone,
-                admin
+                admin//!
             });
         accountCreated.password = undefined;//*Não retorna o password
         return res.status(201).json({ accountCreated });//*Retona account
@@ -58,31 +59,6 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     
         } catch (error) {
             return res.status(400).json({ error });
-        }
-    };
-
-    async uploadImage(req, res){//!
-        // faz um endpoint pra receber uma imagem
-        // grava no banco em base
-        // base64
-        // vincula no account
-        try {
-            const { token } = req.auth;
-            console.log(token)
-            const { originalname: name, size, filename: key } = req.file;
-
-            const verifyAccount = await AccountModel.findOne({ id: token.account_id });
-            if(!verifyAccount) throw 'Conta não existe.';
-
-            const imageUpload = await AccountModel.create({
-                name,
-                size,
-                key,
-                url: '',
-            });
-            return res.status(200).json({ imageUpload });
-        } catch (error) {
-            return res.status(400).json({ error });   
         }
     };
 
@@ -158,8 +134,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async deleteAccount (req, res) {//*Delete account
         try {
             const { token } = res.auth;
-            const verifyDeletedAccount = await AccountModel.findOne({ idAccount: token.account_id, deleted: true });
-            if(verifyDeletedAccount) throw 'Conta já deletada.';
+
             const deleteAccount = await AccountModel.findOneAndUpdate({ _id: token.account_id }, {deleted: true});
 
             return res.status(200).json({deleted: deleteAccount.name, message: 'Deletado com sucesso.'});
