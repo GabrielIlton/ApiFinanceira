@@ -47,13 +47,6 @@ router.post("/P2P", Auth.userAuth, AccountController.P2P);
 
 module.exports = router;//*Exporta as rotas
 
-/**
- * cpf - string
- * name - string
- * id - uuid
- // statement []
- */
-
 /** Tipos de parametros
  * 
  * Route Params => Identificar um recurso editar/deletar/buscar

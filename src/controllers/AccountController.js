@@ -31,8 +31,8 @@ class AccountController {//*É uma classe que tem todas a funcion de account
                 telefone,
                 admin//!
             });
-        accountCreated.password = undefined;//*Não retorna o password
-        return res.status(201).json({ accountCreated });//*Retona account
+       
+        return res.status(201).json({ nome: accountCreated.name, email: accountCreated.email });//*Retona account
 
        }catch(error){//*Dá o erro se a tentativa falhar
            return res.status(422).json({ error });    
@@ -49,7 +49,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
                 account_id: account._id, //*Contém o ID de account no token
                 email: account.email,
                 password: account.password,
-                admin: account.admin
+                admin: account.admin,
             }, 
                 authConfig.secret, 
             {
@@ -66,8 +66,8 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         try {            
             const { token } = res.auth;
             const account = await AccountModel.findOne({ _id: token.account_id, deleted: false });
-            if(!account) throw 'Conta não existe ou está deletada.';
             account.password = undefined;
+            account.deleted = undefined;
             return res.status(200).json({ account });
         }catch (error) {
             return res.status(400).json({error});   
@@ -106,26 +106,19 @@ class AccountController {//*É uma classe que tem todas a funcion de account
             const { token } = res.auth;
             const { passwordOld, email, passwordNew } = req.body;//*Pega do corpo
             
-            await AccountValidator.updatePasswordAccountValidator(req.body);//!Validators
-
             const accountVerify = await AccountModel.findOne({ email });
-            if(!accountVerify) throw 'Conta não existe ou email incorreto.';
+            if(accountVerify.email !== token.email) throw 'Email incorreto.';
             
-            if(!accountVerify){
-                const passwordNewHash = await bcrypt.hash(passwordNew, 10);
-                const accountVerify = await AccountModel.findOneAndUpdate( {cpf}, { email , password: passwordNewHash});
-                return res.status(201).json({ accountVerify });
-            }
-            else{               
-                const passwordCorrect = await bcrypt.compare(passwordOld, accountVerify.password);
-                if(passwordOld === passwordNew) throw 'A senha antiga é igual a digitada, para alterar, digite uma diferente.';
-                if(!passwordCorrect) throw 'Senha incorreta.';
-                if(passwordNew.length <= 3) throw 'Senha nova deve ser maior que 4 dígitos.';
-                const passwordNewHash = await bcrypt.hash(passwordNew, 10);
-                const account = await AccountModel.findOneAndUpdate({_id: token.account_id, deleted: false}, {password: passwordNewHash});//*Encontra o cpf não deletado e add um name novo
-                
-                return res.status(200).json({name: account.name, cpf: account.cpf, email: account.email, message: "Senha alterada com sucesso."});//*Retorna o status de sucesso
-            }
+            await AccountValidator.updatePasswordAccountValidator(req.body);//!Validators
+                        
+            const verifyPassword = await bcrypt.compare(passwordOld, accountVerify.password);
+            if(!verifyPassword) throw 'Senha incorreta.';
+            if(passwordOld === passwordNew) throw 'A senha antiga é igual a digitada, para alterar, digite uma diferente.';
+            if(passwordNew.length <= 3) throw 'Senha nova deve ser maior que 4 dígitos.';
+            const passwordNewHash = await bcrypt.hash(passwordNew, 10);
+            const account = await AccountModel.findOneAndUpdate({_id: token.account_id, deleted: false}, {password: passwordNewHash});//*Encontra o cpf não deletado e add um name novo
+            
+            return res.status(200).json({name: account.name, message: "Senha alterada com sucesso."});//*Retorna o status de sucesso
         } catch (error) {
             return res.status(400).json({error});//*Retorna o status de erro   
         }
@@ -134,6 +127,16 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async deleteAccount (req, res) {//*Delete account
         try {
             const { token } = res.auth;
+            const { idAccountDelete } = req.body;
+
+            if(token.admin === true) {
+                const account = await AccountModel.findOne({ _id: idAccountDelete, deleted: false });
+                if(!account) throw ' Conta não existe.';
+                const deleteAccount = await AccountModel.findOneAndUpdate({ _id: account }, {deleted: true});
+                return res.status(200).json({deleted: deleteAccount.name, message: 'Deletado com sucesso.'});
+            }
+
+            if(idAccountDelete) throw 'Você não tem acesso para deletar contas.';
 
             const deleteAccount = await AccountModel.findOneAndUpdate({ _id: token.account_id }, {deleted: true});
 
@@ -154,7 +157,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
             if(!accountVerifyCpf){//*Verifica se existe Cpf
                 if(accountVerifyCpf != false){
                     const verifyAccountCreated = await AccountModel.findOneAndUpdate({ cpf }, { deleted: false});//*Pesquisa e atualiza account deleted = true
-                    return res.status(201).json({name: verifyAccountCreated.name, cpf: verifyAccountCreated.cpf, email: verifyAccountCreated.email, deleted: "false"});
+                    return res.status(201).json({name: verifyAccountCreated.name, message: "Sua conta foi recuperada com sucesso."});
                 }
             };
         } catch (error) {
@@ -179,7 +182,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
             const total = deposit + account.balance;
             const depositAccount = await AccountModel.findOneAndUpdate({ _id: token.account_id }, { balance: total });
             
-            return res.status(201).json({ name: depositAccount.name, total });
+            return res.status(201).json({ name: depositAccount.name, saldo: total });
         
         } catch (error) {
             return res.status(400).json({message: error});//?Retorna o status
@@ -205,7 +208,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
                 const total = account.balance - withDraw;
                 const withDrawAccount = await AccountModel.findOneAndUpdate({ _id: token.account_id }, { balance: total });
 
-                return res.status(201).json({ nome: withDrawAccount.name, saque: withDraw, total });
+                return res.status(201).json({ nome: withDrawAccount.name, saque: withDraw, saldo: total });
             }else{
                 return res.status(400).json({ message: 'Saldo insuficiente' });
             }

@@ -9,16 +9,14 @@ class AuthMiddlewares {//*É o middleware que verifica se exixte o CPF e faz o b
             if(!authHeader) throw 'Token indefinido';
             const [, token] = authHeader.split(' ');
             const verifyToken = await jwt.verify(token, AuthConfig.secret);
-            const verifyAccount = AccountModel.findOne({ id: verifyToken.account_id, deleted: false });
+            const verifyAccount = await AccountModel.findOne({ _id: verifyToken.account_id, deleted: false });
             if(!verifyAccount) throw 'Conta não existe';
             if(!verifyToken) throw 'Token inválido.';
             res.auth = { token: verifyToken };
-
             next();
         } catch (error) {
             return res.status(400).json({error})
         } 
     }
 };
-//!MIDDLEWARE
 module.exports = new AuthMiddlewares();

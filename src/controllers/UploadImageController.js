@@ -28,7 +28,7 @@ class UploadImage {
                 deleted: false
         
             });
-            return res.status(200).json({ imageUpload });
+            return res.status(200).json({ name: imageUpload.name, size: imageUpload.size });
 
         } catch (error) {
             console.log(error)

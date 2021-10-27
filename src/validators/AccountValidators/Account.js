@@ -6,8 +6,7 @@ function validateEmail(email) {
     return validator.test(email);
 };
 
-class AccountValidator {
-    
+class AccountValidator {   
     async accountCreateValidator(body) {         
         if(!validateEmail(body.email)) throw 'Email deve ter uma estrutura adequada, como por exemplo "karlos@gmail.com".'
         if(!body.name) throw 'Nome é obrigatório.';//*Verifica se nome exixte

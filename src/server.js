@@ -1,14 +1,11 @@
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/apiFinanceira', { useNewUrlParser: true });
 const express = require('express');
 const routes = require('./routes/routes');
-const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/apiFinanceira', {
-    useNewUrlParser: true
-});
 const swaggerUi = require('swagger-ui-express'); 
 const swaggerDocs = require('../swagger.json')
 const morgan = require('morgan');
 const path = require('path');
-
 
 const app = express();
 app.use(express.json());
@@ -22,7 +19,7 @@ app.listen(3333,() => {//?Eh a porta que está rodando no navegador
     console.log("Rodando")
 });
 
-// GET: Leitura
+// -GET: Leitura
 // -POST: Criação
 // -PULL: Atualização
 // -DELETE: Deleção
@@ -50,7 +47,7 @@ app.listen(3333,() => {//?Eh a porta que está rodando no navegador
 
 
 // app.get("/", (req, res) => {// EH O REQUERIMENTO E A RESPOSTA
-//     return res.json({ message: "Hello World!  " }); //? RETORNA QUALQUER COISA COM O JSON NO localhost:3333
+//     return res.json({ message: "Hello World!  " }); //? RETORNA QUALQUER COISA EM JSON
 // });
 
 // //todo: splice altera o conteudo, add conteudo novo e remove o velho
