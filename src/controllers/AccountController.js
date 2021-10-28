@@ -1,61 +1,28 @@
 const mongoose = require('mongoose');//*Importa o mongoose
 mongoose.connect('mongodb://localhost:27017/apiFinanceira');//*Conecta o mongoose com o mongodb
-const AccountModel = require('../models/account');//*Importa a collection de models
 const StatementModel = require('../models/statement');//*Importa a collection statement
 const TransactionModel = require('../models/transaction');//*Importa a collection transaction
-const jwt = require('jsonwebtoken');//*Importa o jsonwebtoken
-const bcrypt = require('bcryptjs');//*Importa o bcryptjs
-const authConfig = require('../config/auth');//*Importa o authConfig
-const AccountValidator = require('../validators/AccountValidators/Account');
-// const multerConfig = require('../config/multer');
+const AccountService = require('../services/Account/AccountService');
+const AccountRepository = require('../repositories/Account/AccountRepository');
 
 
 class AccountController {//*É uma classe que tem todas a funcion de account
-    //! ADD Documentation
     async createAccount(req, res) {//*Create account 
-        try {
-            const { name , cpf, endereco, telefone, email, password, admin } = req.body;//*Pega os dados do body da requisição
-            
-            await AccountValidator.accountCreateValidator(req.body);//!Validators
-            
-            const accountVerifyCpf = await AccountModel.findOne({ cpf });//*Faz a pesquisa se cpf já existe
-            const accountVerifyEmail = await AccountModel.findOne({ email });//*Faz a pesquisa se email já existe
-    
-            if(accountVerifyCpf || accountVerifyEmail) throw 'CPF ou email já existente.';//*Retorna o erro caso já exista CPF  ou email
-            const accountCreated = await AccountModel.create({//*Requere e cria no banco os dados
-                name: name[0].toUpperCase() + name.substring(1).toLowerCase(),
-                cpf,
-                email: email.toLowerCase(),
-                password,
-                endereco: {rua: endereco.rua, bairro: endereco.bairro, numero: endereco.numero},//*Cria um objeto no banco
-                telefone,
-                admin//!
-            });
-       
-        return res.status(201).json({ nome: accountCreated.name, email: accountCreated.email });//*Retona account
-
-       }catch(error){//*Dá o erro se a tentativa falhar
+        try {            
+            const accountCreated = await AccountService.createAccount({ body: req.body })
+        
+            return res.status(201).json({ nome: accountCreated.name, email: accountCreated.email });
+       }catch(error){
            return res.status(422).json({ error });    
        };
     };
 
     async loginAccount(req, res){//*Login account created
         try {
-            const { email, password } = req.body;
             const { account } = res.login;
+            const loginAccount = await AccountService.loginAccount({ account });
             
-            email.toLowerCase();
-            const token = jwt.sign({//*Gera o token com o ID de account
-                account_id: account._id, //*Contém o ID de account no token
-                email: account.email,
-                password: account.password,
-                admin: account.admin,
-            }, 
-                authConfig.secret, 
-            {
-                expiresIn: '1h'
-            });
-            return res.status(200).json({ name: account.name, token });
+            return res.status(200).json({ name: account.name, loginAccount });
     
         } catch (error) {
             return res.status(400).json({ error });
@@ -65,7 +32,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async getAccountDetails (req, res) {//*Find one account
         try {            
             const { token } = res.auth;
-            const account = await AccountModel.findOne({ _id: token.account_id, deleted: false });
+            const account = await AccountService.getAccountDetails({ token })
             account.password = undefined;
             account.deleted = undefined;
             return res.status(200).json({ account });
@@ -74,11 +41,10 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         }
     };
 
-    async getSaldo (req, res) {//*Find o saldo de uma account
+    async getSaldo (req, res) {//*Find balance account
         try {
             const { token } = res.auth;
-            const account = await AccountModel.findOne({ _id: token.account_id, deleted: false });
-            if(!account) throw 'Conta não existe.';
+            const account = await AccountService.getSaldo({ token });
             return res.status(200).json({ Nome: account.name, Balance: account.balance });
           
         } catch (error) {
@@ -89,13 +55,9 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async getAccounts (req, res) {//*Find all accounts
         try {   
             const { token } = res.auth;
-            const account = await AccountModel.findOne({ _id: token.account_id, admin: true }); 
-            if(!account) throw 'Você não tem acesso a essa rota.'
-            const accounts = await AccountModel.find({ });//*Primeiro parametro eh a pesquisa e o segundo vai mostrar
-            if(!accounts) throw 'Conta não existe.';
-            accounts.password = undefined;
-
-            return res.status(200).json({ accounts });
+            const getAccounts = await AccountService.getAccounts({ token });
+            getAccounts.password = undefined;
+            return res.status(200).json({ getAccounts });
         }catch (error) {
             return res.status(400).json({message: error});   
         }
@@ -104,28 +66,16 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async updatePasswordAccount (req,res) {//*Put o password
         try {            
             const { token } = res.auth;
-            const { passwordOld, email, passwordNew } = req.body;//*Pega do corpo
-            
-            const accountVerify = await AccountModel.findOne({ email });
-            if(accountVerify.email !== token.email) throw 'Email incorreto.';
-            
-            await AccountValidator.updatePasswordAccountValidator(req.body);//!Validators
-                        
-            const verifyPassword = await bcrypt.compare(passwordOld, accountVerify.password);
-            if(!verifyPassword) throw 'Senha incorreta.';
-            if(passwordOld === passwordNew) throw 'A senha antiga é igual a digitada, para alterar, digite uma diferente.';
-            if(passwordNew.length <= 3) throw 'Senha nova deve ser maior que 4 dígitos.';
-            const passwordNewHash = await bcrypt.hash(passwordNew, 10);
-            const account = await AccountModel.findOneAndUpdate({_id: token.account_id, deleted: false}, {password: passwordNewHash});//*Encontra o cpf não deletado e add um name novo
-            
-            return res.status(200).json({name: account.name, message: "Senha alterada com sucesso."});//*Retorna o status de sucesso
+
+            const updatePasswordAccountVerify = await AccountService.updatePasswordAccount({ body: req.body, token })
+            return res.status(200).json({name: updatePasswordAccountVerify.name, message: "Senha alterada com sucesso."});//*Retorna o status de sucesso
         } catch (error) {
             return res.status(400).json({error});//*Retorna o status de erro   
         }
     };
 
     async deleteAccount (req, res) {//*Delete account
-        try {
+        try {   
             const { token } = res.auth;
             const { idAccountDelete } = req.body;
 
@@ -192,7 +142,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async withdrawAccount (req, res) {//*WithDraw in account 
         try {
             const { token } = res.auth;
-            const { withDraw } = req.body;//Desestruturação
+            const { withDraw } = req.body;
             
             await AccountValidator.withdrawAccountValidator(req.body);//!Validators
 
@@ -224,7 +174,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
             
             await AccountValidator.P2PValidator(req.body);//!Validators
 
-            const accountReciever = await AccountModel.findOne({ cpf: cpfReciever, deleted: false });//*Faz a pesquisa se cpf já existe e não deletado
+            const accountReciever = await AccountModel.findOne({ cpf: cpfReciever, deleted: false });
             const accountSend = await AccountModel.findOne({ _id: token.account_id, deleted: false });
             
             if(!accountSend) throw 'Conta não existe.';
@@ -232,15 +182,15 @@ class AccountController {//*É uma classe que tem todas a funcion de account
             if(accountSend.balance < amount) throw 'Não tem saldo suficiente para a transação.';
             if(token.account_id === accountReciever.id) throw 'Não pode fazer a transferência para si mesmo.'
 
-            await TransactionModel.create({//*Instancia e cria no banco os dados 
+            await TransactionModel.create({ 
                 type: 'cashout',
-                amount: amount,//*Ammount
+                amount: amount,
                 accountId: accountSend._id
             });
             const totalSend = accountSend.balance - amount;
             await AccountModel.findOneAndUpdate({ cpf: accountSend.cpf }, { balance: totalSend}, {new: true});
 
-            await TransactionModel.create({//*Instancia e cria no banco os dados
+            await TransactionModel.create({
                 type: 'cashin',
                 amount: amount,
                 accountId: accountReciever._id
@@ -267,4 +217,4 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     };
 }      
 
-module.exports = new AccountController();
+module.exports = new AccountController();3

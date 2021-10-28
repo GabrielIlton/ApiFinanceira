@@ -1,21 +1,22 @@
 const AccountModel = require('../models/account');
-const bcrypt = require('bcryptjs');//*Importa o bcryptjs
+const bcrypt = require('bcryptjs');
+const AccountRepository = require('../repositories/Account/AccountRepository');
 
-class AuthMiddlewares {//*É o middleware que verifica se exixte o CPF e faz o balanço da conta geral
-    async userLogin (req, res, next) {//?Verifica se exixte o CPF, e no next determina se a function continua ou não
+
+class AuthMiddlewares {
+    async userLogin (req, res, next) {
         try {
             const login = req.body;
-            const account = await AccountModel.findOne({ email: login.email, deleted: false });
+            const account = await AccountRepository.findByDocumentEmail({ email: login.email });
             if(!account) throw 'Conta não existe.';
             const passwordCorrect = await bcrypt.compare(login.password, account.password);
             if(!passwordCorrect) throw 'Senha incorreta.';
             res.login = { account };
-
             next();
         } catch (error) {
             return res.status(400).json({error})
         } 
     }
 };
-//!MIDDLEWARE
+
 module.exports = new AuthMiddlewares();

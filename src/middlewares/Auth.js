@@ -1,15 +1,17 @@
 const AccountModel = require('../models/account');
 const jwt = require('jsonwebtoken');
 const AuthConfig = require('../config/auth');
+const AccountRepository = require('../repositories/Account/AccountRepository');
+
 
 class AuthMiddlewares {//*É o middleware que verifica se exixte o CPF e faz o balanço da conta geral
-    async userAuth (req, res, next) {//?Verifica se exixte o CPF, e no next determina se a function continua ou não
+    async userAuth (req, res, next) {
         try {
             const authHeader = req.headers.authorization;
             if(!authHeader) throw 'Token indefinido';
             const [, token] = authHeader.split(' ');
             const verifyToken = await jwt.verify(token, AuthConfig.secret);
-            const verifyAccount = await AccountModel.findOne({ _id: verifyToken.account_id, deleted: false });
+            const verifyAccount = await AccountRepository.findById({ id: verifyToken.account_id });
             if(!verifyAccount) throw 'Conta não existe';
             if(!verifyToken) throw 'Token inválido.';
             res.auth = { token: verifyToken };

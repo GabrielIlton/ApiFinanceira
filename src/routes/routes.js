@@ -1,17 +1,14 @@
-const { Router } = require('express');//*Importa o express
-const router = Router();//*Importa a function router
-const AccountController = require('../controllers/AccountController');//*Importa os controllers
+const { Router } = require('express');
+const router = Router();
+const AccountController = require('../controllers/AccountController');
 const StatementController = require('../controllers/StatementController');
 const UploadImage = require('../controllers/UploadImageController');
 const Auth = require('../middlewares/Auth');
 const Login = require('../middlewares/Login');
 const multer = require('multer');
 const multerConfig = require('../config/multer');
-// const FinanceMiddlewares = require('../middlewares/FinanceMiddlewares');
-// const authConfig = require('../config/auth.json');
-// const bcrypt = require('bcryptjs');
 
-//!SÃO TODAS AS ROTAS DA APLICATION
+//!SÃO TODAS AS ROTAS DA APLICAÇÃO
       
 router.post("/create", AccountController.createAccount);
 
@@ -25,9 +22,9 @@ router.get("/accounts/list", Auth.userAuth, AccountController.getAccounts);
 
 router.put("/password", Auth.userAuth, AccountController.updatePasswordAccount);
 
-router.post("/image", Auth.userAuth, multer(multerConfig).single('file'), UploadImage.uploadImage);//!Fazer funcionar
+router.post("/image", Auth.userAuth, multer(multerConfig).single('file'), UploadImage.uploadImage);
 
-router.delete("/image", Auth.userAuth, UploadImage.deleteImage);//!Fazer funcionar
+router.delete("/image", Auth.userAuth, UploadImage.deleteImage);
 
 router.delete("/delete", Auth.userAuth, AccountController.deleteAccount);
 
@@ -45,7 +42,7 @@ router.post("/withdraw", Auth.userAuth, AccountController.withdrawAccount);
 
 router.post("/P2P", Auth.userAuth, AccountController.P2P);
 
-module.exports = router;//*Exporta as rotas
+module.exports = router;
 
 /** Tipos de parametros
  * 

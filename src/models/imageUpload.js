@@ -47,4 +47,4 @@ ImageSchema.pre("updateOne", async function(next){
 
 
 
-module.exports = model('Image', ImageSchema);//*Envia pro banco
+module.exports = model('Image', ImageSchema);

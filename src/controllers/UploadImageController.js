@@ -1,13 +1,8 @@
 const ImageModel = require('../models/imageUpload');//*Importa a collection de models
 const fs = require('fs');
 
-// function base64Encode(file) {
-//     const base64 = fs.readFileSync(file);
-//     return base64.toString('base64');
-// }
-
 class UploadImage {
-    async uploadImage(req, res){//!Add na documentação
+    async uploadImage(req, res){
         try {
             const { token } = res.auth;
             const { file } = req;
@@ -36,11 +31,11 @@ class UploadImage {
         }
     };
 
-    async deleteImage(req, res){//!Add na documentação
+    async deleteImage(req, res){
         try {
             const { token } = res.auth;
             
-            const imageDelete = await ImageModel.findOneAndUpdate({ accountId: token.account_id, deleted: false }, { deleted: true });//?EXCLUIR O ARQUIVO DA PASTA LOCAL
+            const imageDelete = await ImageModel.findOneAndUpdate({ accountId: token.account_id, deleted: false }, { deleted: true });
             if(!imageDelete) throw 'Imagem não existe.';
 
             return res.status(200).json({ message: 'Deletado com sucesso.' });

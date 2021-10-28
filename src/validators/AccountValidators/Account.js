@@ -1,5 +1,6 @@
-const mongoose = require('mongoose');//*Importa o mongoose
-mongoose.connect('mongodb://localhost:27017/apiFinanceira');//*Conecta o mongoose com o mongodb
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/apiFinanceira');
+
 
 function validateEmail(email) {
     const validator = /\S+@\S+\.\S+/;
@@ -8,7 +9,7 @@ function validateEmail(email) {
 
 class AccountValidator {   
     async accountCreateValidator(body) {         
-        if(!validateEmail(body.email)) throw 'Email deve ter uma estrutura adequada, como por exemplo "karlos@gmail.com".'
+        if(!validateEmail(body.email)) throw 'Email deve ter uma estrutura adequada, como por exemplo "karrlus@gmail.com".'
         if(!body.name) throw 'Nome é obrigatório.';//*Verifica se nome exixte
         if(!body.cpf) throw 'CPF é obrigatório.';//*Verifica se cpf existe
         if(String(body.cpf).length != 11) throw 'CPF deve ser igual a 11 caracteres.';//*Verifica se cpf existe

@@ -1,6 +1,7 @@
 const { model, Schema } = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+
 const AccountSchema = new Schema({
      name: {
           type: String,
@@ -50,4 +51,4 @@ AccountSchema.pre('save', async function(next){
      next();
 });
 
-module.exports = model('Account', AccountSchema);//*Envia pro banco
+module.exports = model('Account', AccountSchema);
