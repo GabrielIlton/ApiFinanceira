@@ -1,4 +1,3 @@
-const AccountModel = require('../models/account');
 const jwt = require('jsonwebtoken');
 const AuthConfig = require('../config/auth');
 const AccountRepository = require('../repositories/Account/AccountRepository');

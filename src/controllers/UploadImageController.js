@@ -35,7 +35,7 @@ class UploadImage {
         try {
             const { token } = res.auth;
             
-            const imageDelete = await ImageModel.findOneAndUpdate({ accountId: token.account_id, deleted: false }, { deleted: true });
+            const imageDelete = await ImageModel.findOneAndUpdate({ _id: token.account_id, deleted: false }, { deleted: true });
             if(!imageDelete) throw 'Imagem não existe.';
 
             return res.status(200).json({ message: 'Deletado com sucesso.' });

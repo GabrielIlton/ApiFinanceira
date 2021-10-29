@@ -3,7 +3,8 @@ const AccountModel = require('../../models/account');//*Importa a collection de 
 
 class AccountRepository {
     async findByDocumentCpf ({ cpf }) {
-       return await AccountModel.findOne({ cpf });
+        const account = await AccountModel.findOne({ cpf });
+        return account;
     }
 
     async findByDocumentEmail ({ email }) {
@@ -21,8 +22,13 @@ class AccountRepository {
         });
     }
 
+    async findByAccountDeletedTrue ({ cpf }) {
+        return await AccountModel.findOne({ cpf, deleted: true });
+    }
+
     async findById ({ id }) {
-        return await AccountModel.findOne({ _id: id, deleted: false });
+        const account = await AccountModel.findOne({ _id: id, deleted: false });
+        return account;
     }
 
     async findByAdmin ({ id }) {
@@ -39,6 +45,23 @@ class AccountRepository {
         const account = await AccountModel.findOneAndUpdate({ _id: id, deleted: false}, { password: passwordNew });//*Encontra o cpf não deletado e add um name novo
         return account;
     }
+
+    async findOneAndUpadateDelete ({ id }) {
+        const accountDelete = await AccountModel.findOneAndUpdate({ _id: id, deleted: false}, { deleted: true });
+        return accountDelete;
+    }
+
+    async findOneAndUpadateRetrieve ({ cpf }) {
+        const accountRetrieve = await AccountModel.findOneAndUpdate({ cpf , deleted: true}, { deleted: false });
+        return accountRetrieve;
+    }
+
+    async findOneAndUpdateBalance ({ id, total }) {
+        const balanceAccount = await AccountModel.findOneAndUpdate({ _id: id }, { balance: total });
+        return balanceAccount;
+    }
+
+    
 }
 
 module.exports = new AccountRepository();
