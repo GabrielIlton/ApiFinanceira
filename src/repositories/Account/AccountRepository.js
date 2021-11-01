@@ -59,9 +59,7 @@ class AccountRepository {
     async findOneAndUpdateBalance ({ id, total }) {
         const balanceAccount = await AccountModel.findOneAndUpdate({ _id: id }, { balance: total });
         return balanceAccount;
-    }
-
-    
+    }  
 }
 
 module.exports = new AccountRepository();

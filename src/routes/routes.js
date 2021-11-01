@@ -2,7 +2,7 @@ const { Router } = require('express');
 const router = Router();
 const AccountController = require('../controllers/AccountController');
 const StatementController = require('../controllers/StatementController');
-const UploadImage = require('../controllers/UploadImageController');
+const Image = require('../controllers/ImageController');
 const Auth = require('../middlewares/Auth');
 const Login = require('../middlewares/Login');
 const multer = require('multer');
@@ -22,9 +22,9 @@ router.get("/accounts/list", Auth.userAuth, AccountController.getAccounts);
 
 router.put("/password", Auth.userAuth, AccountController.updatePasswordAccount);
 
-router.post("/image", Auth.userAuth, multer(multerConfig).single('file'), UploadImage.uploadImage);
+router.post("/image", Auth.userAuth, multer(multerConfig).single('file'), Image.uploadImage);
 
-router.delete("/image", Auth.userAuth, UploadImage.deleteImage);
+router.delete("/image", Auth.userAuth, Image.deleteImage);
 
 router.delete("/delete", Auth.userAuth, AccountController.deleteAccount);
 
@@ -40,7 +40,7 @@ router.post("/deposit", Auth.userAuth, AccountController.depositAccount);
 
 router.post("/withdraw", Auth.userAuth, AccountController.withdrawAccount);
 
-router.post("/P2P", Auth.userAuth, AccountController.P2P);
+router.post("/p2p", Auth.userAuth, AccountController.p2p);
 
 module.exports = router;
 

@@ -1,7 +1,7 @@
 const StatementModel = require('../../models/statement');
 
 class StatementRepository {
-    async depositStatement ({ deposit, token }) {
+    async depositCreateStatement ({ deposit, token }) {
         const depositStatement = await StatementModel.create({
             type: 'deposit',
             amount: deposit,
@@ -10,7 +10,7 @@ class StatementRepository {
         return depositStatement;
     }
 
-    async withDrawStatement ({ withDraw, token }) {
+    async withDrawCreateStatement ({ withDraw, token }) {
         const withDrawStatement = await StatementModel.create({
             type: 'withDraw',
             amount: withDraw,
@@ -19,7 +19,7 @@ class StatementRepository {
         return withDrawStatement;
     }
 
-    async P2Pcashout ({ amount, accountSend }) {
+    async P2PcashoutCreate ({ amount, accountSend }) {
         return await StatementModel.create({
             type:'cashoutP2P',
             amount: amount,    
@@ -27,7 +27,7 @@ class StatementRepository {
         });
     }
 
-    async P2Pcashin ({ amount, accountReciever }) {
+    async P2PcashinCreate ({ amount, accountReciever }) {
         return await StatementModel.create({ 
             type:'cashinP2P',
             amount: amount, 
@@ -35,6 +35,18 @@ class StatementRepository {
         });
     }
 
+    async findByIdListStatements ({ id }) {
+        return await StatementModel.find({ accountId: id });
+    }
+
+    async findByDateStatements ({ condition }) {
+        const statement = await StatementModel.find(condition)
+        return statement;
+    }
+
+    async findAllStatements ({}) {
+        return await StatementModel.find({})
+    }
 }
 
 module.exports = new StatementRepository();

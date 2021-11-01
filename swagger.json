@@ -19,7 +19,7 @@
         "/create": {
             "post": {
                 "summary": "Cadastro de conta.",
-                "description": "Essa rota cria uma conta com nome, email, senha, endereço e telefone.",
+                "description": "Essa rota cria uma conta com nome, CPF, email, senha, endereço e telefone.",
                 "tags": ["Account"],
                 "requestBody": {
                     "content": {
@@ -73,15 +73,15 @@
             "post": {
                 "tags": ["Account"],
                 "summary": "Realiza o login da conta já criada no banco.",
-                "description": "Realiza o login na conta com email e senha que existe já foi criada na rota '/create' e gera um token que irá conter o Id da conta logada, seu secret e o tempo de expiração, com esse token é possível acessar as rotas que têm autenticação.",
+                "description": "Realiza o login na conta com email e senha que existe já foi criada na rota '/create' e gera um token que irá conter o Id da conta logada, seu secret e o tempo de expiração, com esse token é possível acessar as rotas e se autenticar.",
                 "requestBody": {
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/LoginAccount"
+                                "$ref": "#/components/schemas/Login"
                             },
                             "examples": {
-                                "loginAccount": {
+                                "login": {
                                     "value": {
                                         "email": "anjo@gmail.com",
                                         "password": "1000"
@@ -100,7 +100,7 @@
                         "content": {
                             "application/json": {
                                 "examples":{
-                                    "LoginAccount": {
+                                    "login": {
                                         "value": {
                                             "name": "Nome da conta que foi logada/acessada.",
                                             "token": "Retorna o token que será utilizado nas rotas para autenticação."
@@ -135,18 +135,14 @@
                                 "examples":{
                                     "details": {
                                         "value": {
-                                            "_id": "Retorna o Id da conta salva no banco.",
                                             "name": "Retorna o nome da conta salva no banco.",
                                             "cpf": "Retorna o CPF da conta.",
                                             "email": "Retorna o email da conta.",
                                             "endereco": {
                                                 "rua": "Retorna a rua cadastrada no endereco da conta.",
                                                 "bairro": "Retorna o bairro cadastrado no endereco da conta.",
-                                                "numero": "Retorna o numero cadastrado no endereco da conta.",
-                                                "_id": "Retorna o identificador de cadastro do objeto que no caso é o endereço."
-                                            },
+                                                "numero": "Retorna o numero cadastrado no endereco da conta."                                            },
                                             "telefone": "Retorna o telefone da conta salva no banco.",
-                                            "balance": "Retorna o saldo da conta.",
                                             "admin": "Retorna o status de admin da conta se é verdadeiro ou falso."
                                         }
                                     }
@@ -162,7 +158,7 @@
             "get": {
                 "tags": ["Account"],
                 "summary": "Recupera o saldo da conta.",
-                "description": "Recupera o saldo da conta pelo Id contido no token do headers.",
+                "description": "Recupera o saldo da conta pelo Id contido no token do Headers.",
                 "security": [
                     {
                         "bearerAuth": []
@@ -179,8 +175,8 @@
                                 "examples":{
                                     "balance": {
                                         "value": {
-                                            "nameAccount": "Nome da conta que está sendo recuperado o saldo.",
-                                            "saldoAccount": "Retorna o saldo da conta."
+                                            "name": "Nome da conta que está sendo recuperado o saldo.",
+                                            "saldo": "Retorna o saldo da conta."
                                         }
                                     }
                                 }
@@ -226,7 +222,7 @@
         "/password": {
             "put":{
                 "summary": "Atualiza a senha da conta.",
-                "description": "Atualiza a senha da conta que exista, a conta que será atualizada vem no token, pega o Id do token no headers, a senha antiga, o email, e a senha nova do body e atualiza.",
+                "description": "Atualiza a senha da conta que exista, a conta que será atualizada vem no token, pega o Id do token no Headers, a senha antiga, o email, e a senha nova do body e atualiza.",
                 "tags": ["Account"],
                 "security": [
                     {
@@ -240,7 +236,7 @@
                                 "$ref": "#/components/schemas/Password"
                             },
                             "examples": {
-                                "updatePasswordAccount": {
+                                "updatePassword": {
                                     "value": {
                                         "passwordOld": "1000",
                                         "email": "anjo@gmail.com",
@@ -260,7 +256,7 @@
                         "content": {
                             "application/json": {
                                 "examples":{
-                                    "updatePasswordAccount": {
+                                    "updatePassword": {
                                         "value": {
                                             "nome":"Nome do usuario que teve a senha alterada.",
                                             "message": "Senha alterada com sucesso."
@@ -277,8 +273,8 @@
         "/delete": {
             "delete": {
                 "tags": ["Account"],
-                "summary": "'Deleta' a conta.",
-                "description": "'Deleta' a conta cadastrada de acordo com o Id recebido no token e atualiza no banco como 'deleted: true'.",
+                "summary": "Deleta a conta.",
+                "description": "Deleta a conta cadastrada de acordo com o Id recebido no token.",
                 "security": [
                     {
                         "bearerAuth": [] 
@@ -293,7 +289,7 @@
                         "content": {
                             "application/json": {
                                 "examples":{
-                                    "deleteAccount": {
+                                    "delete": {
                                         "value": {
                                             "deleted": "Retorna o nome da conta deletada.",
                                             "message": "Retorna a informação de deletado com sucesso."
@@ -319,7 +315,7 @@
                                 "$ref": "#/components/schemas/Retrieve"
                             },
                             "examples": {
-                                "retrieveAccount": {
+                                "retrieve": {
                                     "value": {
                                         "cpf": 10000000000
                                     }
@@ -330,16 +326,16 @@
                 },
                 "responses": {
                     "400": {
-                        "description": "Conta não encontrada ou Conta já existe."
+                        "description": "Conta não encontrada ou conta já existe."
                     },
                     "201": {
                         "description": "Sucesso ao recuperar a conta.",
                         "content": {
                             "application/json": {
                                 "examples":{
-                                    "retrieveAccount": {
+                                    "retrieve": {
                                         "value": {
-                                            "name":"Nome da conta que foi reagatada.",
+                                            "name":"Nome da conta que foi resgatada.",
                                             "message":"Mensagem com a informação de sucesso."
                                         }
                                     }
@@ -413,7 +409,7 @@
                                 "examples":{
                                     "deleteImage": {
                                         "value": {
-                                            "message": "Retorna a messagem de sucesso ao deletar a imagem."
+                                            "message": "Retorna a mensagem de sucesso ao deletar a imagem."
                                         }
                                     }
                                 }
@@ -429,7 +425,7 @@
             "get": {
                 "tags": ["Statement"],
                 "summary": "Busca o estrato da conta.",
-                "description": "Busca o estrato da conta e realiza essa busca com o token recebido no headers.",
+                "description": "Busca o estrato da conta e realiza essa busca com o token recebido no Headers.",
                 "security": [
                     {
                         "bearerAuth": []
@@ -444,14 +440,11 @@
                         "content": {
                             "application/json": {
                                 "examples":{
-                                    "statementone": {
+                                    "statement": {
                                         "value": {
-                                            "_id": "Retorna o Id de gravação da transação no banco.",
                                             "amount": "Retorna o valor da transação.",
                                             "type": "Retorna o tipo da transação.",
-                                            "accountId": "Retorna o Id da própria conta.",
-                                            "created_at": "Retorna a data de criação.",
-                                            "updated_at": "Retorna a data de atualização."
+                                            "created_at": "Retorna a data de criação."
                                         }
                                     }
                                 }
@@ -495,12 +488,9 @@
                                 "examples":{
                                     "statementByDate": {
                                         "value": {
-                                            "_id": "Retorna o Id da conta",
                                             "amount": "Retorna o valor da transação",
                                             "type": "Retorna o tipo da transação",
-                                            "accountId": "Retorna o Id da conta de statement",
-                                            "created_at": "Retorna a data de criação",
-                                            "updated_at": "Retorna a data de atualização"
+                                            "created_at": "Retorna a data de criação"
                                         }
                                     }
                                 }
@@ -514,8 +504,8 @@
         "/statement/list": {
             "get": {
                 "tags": ["Statement"],
-                "description": "Busca o estrato de todas as contas",
-                "summary": "Busca o estrato de todas as contas",
+                "description": "Busca o estrato de todas as contas.",
+                "summary": "Busca o estrato de todas as contas.",
                 "security":[
                     {
                         "bearerAuth": []
@@ -523,21 +513,19 @@
                 ],
                 "responses": {
                     "400": {
-                        "description": "Account deleted false."
+                        "description": "Falha ao resgatar os estratos."
                     },
                     "201": {
-                        "description": "Sucesso ao recuperar account.",
+                        "description": "Sucesso ao recuperar todos os estratos.",
                         "content": {
                             "application/json": {
                                 "examples":{
                                     "statementAll": {
                                         "value": {
-                                            "_id": "Retorna o Id de gravação da transação no banco",
+                                            "accountId": "Retorna o Id de Account de statement",
                                             "amount": "Retorna o value da transação",
                                             "type": "Retorna o type da transação",
-                                            "accountId": "Retorna o Id de Account de statement",
-                                            "created_at": "Retorna a data de criação",
-                                            "updated_at": "Retorna a data de atualização"
+                                            "created_at": "Retorna a data de criação"
                                         }
                                     }
                                 }
@@ -552,7 +540,7 @@
             "post": {
                 "tags": ["Transaction"],
                 "summary": "Realiza o depósito na conta.",
-                "description": "Realiza o depósito na conta, que no caso é o Id da conta que vem no token recebido no headers",
+                "description": "Realiza o depósito na conta, que no caso é o Id da conta que vem no token recebido no Headers",
                 "security": [
                     {
                         "bearerAuth": []
@@ -601,7 +589,7 @@
             "post": {
                 "tags": ["Transaction"],
                 "summary": "Realiza o saque na conta.",
-                "description": "Realiza o saque na conta referente ao Id recebido no token de verificação vindo do headers.",
+                "description": "Realiza o saque na conta referente ao Id recebido no token de verificação vindo do Headers.",
                 "security": [
                     {
                         "bearerAuth": []
@@ -611,7 +599,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Deposit"
+                                "$ref": "#/components/schemas/WithDraw"
                             },
                             "examples": {
                                 "account": {
@@ -647,7 +635,7 @@
             }
         },
 
-        "/P2P": {
+        "/p2p": {
             "post": {
                 "tags": ["Transaction"],
                 "summary": "Realiza a transação.",
@@ -661,10 +649,10 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/AccountP2P"
+                                "$ref": "#/components/schemas/P2P"
                             },
                             "examples": {
-                                "accountP2P": {
+                                "P2P": {
                                     "value": {
                                         "cpfReciever": 33342333333,
                                         "amount": 200
@@ -752,7 +740,7 @@
                     } 
                 }
             },
-            "Withdraw": {
+            "WithDraw": {
                 "type": "object",
                 "properties": {
                     "withdraw": {
@@ -774,7 +762,7 @@
                     }
                 }
             },
-            "AccountP2P": {
+            "P2P": {
                 "type": "object",
                 "properties": {
                     "cpfReciever": {
@@ -785,7 +773,7 @@
                     }
                 }
             },
-            "LoginAccount": {
+            "Login": {
                 "type": "object",
                 "properties": {
                     "email": {

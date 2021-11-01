@@ -3,7 +3,7 @@ mongoose.connect('mongodb://localhost:27017/apiFinanceira');//*Conecta o mongoos
 
 
 class StatementValidator {
-    async satatementByDateValidator(query) {         
+    async statementByDateValidator(query) {         
         if(!query.startDate) throw 'Data de início da pesquisa é obrigatória.';
         if(!query.endDate) throw 'Data final da pesquisa é obrigatória.';
     };

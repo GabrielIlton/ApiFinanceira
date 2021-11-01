@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');//*Importa o mongoose
 mongoose.connect('mongodb://localhost:27017/apiFinanceira');//*Conecta o mongoose com o mongodb
-const StatementModel = require('../models/statement');//*Importa a collection statement
-const TransactionModel = require('../models/transaction');//*Importa a collection transaction
 const AccountService = require('../services/Account/AccountService');
-const AccountValidator = require('../validators/AccountValidators/Account');
-const AccountModel = require('../models/account');//*Importa a collection de models
-
 
 class AccountController {//*É uma classe que tem todas a funcion de account
     async createAccount(req, res) {//*Create account 
@@ -34,9 +29,21 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         try {            
             const { token } = res.auth;
             const account = await AccountService.getAccountDetails({ token })
-            account.password = undefined;
-            account.deleted = undefined;
-            return res.status(200).json({ account });
+         
+            const finalReturn = { 
+                name: account.name,
+                cpf: account.cpf,
+                email: account.email,
+                endereço: {
+                    rua: account.endereco.rua,
+                    bairro: account.endereco.bairro,
+                    numero: account.endereco.numero,
+                },
+                telefone: account.telefone,
+                admin: account.admin
+            };
+
+            return res.status(200).json({ finalReturn });
         }catch (error) {
             return res.status(400).json({error});   
         }
@@ -57,8 +64,17 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         try {   
             const { token } = res.auth;
             const accounts = await AccountService.getAccounts({ token });
-            accounts.password = undefined;
-            return res.status(200).json({ accounts });
+            const finalReturn = accounts.map(account => ({ 
+                name: account.name,
+                cpf: account.cpf,
+                email: account.email,
+                endereco: account.endereco,
+                telefone: account.telefone,
+                deleted: account.deleted,
+                balance: account.balance,
+                admin: account.admin
+            }));
+            return res.status(200).json({ finalReturn });
         }catch (error) {
             return res.status(400).json({message: error});   
         }
@@ -89,7 +105,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async retrieveAccount(req, res){//*Retrieve a conta caso esteja excluida 
         try {           
             const account = await AccountService.retrieveAccount({ body: req.body });
-            return res.status(200).json({ name: account.name, message: 'Sua conta foi recuperada com sucesso.' });
+            return res.status(200).json({ name: account.name, message: 'Conta recuperada com sucesso.' });
         } catch (error) {
             return res.status(400).json({error})
         };
@@ -117,14 +133,15 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         }
     };
 
-    async P2P (req, res) {//*P2P
+    async p2p (req, res) {//*P2P
         try {
             const { token } = res.auth;
             
-            return account = await AccountService.P2P({ body: req.body, token });//!CONSERTAR O RETORNO
-        
+            const { accountSend, accountReciever } = await AccountService.p2p({ body: req.body, token });
+
+            return res.status(200).json({ accountSend: accountSend.name, cashout: req.body.amount, saldo: accountSend.balance - req.body.amount, accountReciever: accountReciever.name, cashin: accountReciever.balance + req.body.amount });//!ACERTAR
         } catch (error) {
-            return res.status(400).json({message: error});//?Retorna o status
+            return res.status(400).json({ message: error });//?Retorna o status
         }
     };
 }      
