@@ -1,5 +1,4 @@
 const fs = require('fs');
-const { findImageByIdDeleted } = require('../../repositories/Image/imageRepository');
 const ImageRepository = require('../../repositories/Image/imageRepository');
 
 

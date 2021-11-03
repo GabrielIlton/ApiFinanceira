@@ -1,4 +1,3 @@
-const AccountModel = require('../models/account');
 const bcrypt = require('bcryptjs');
 const AccountRepository = require('../repositories/Account/AccountRepository');
 

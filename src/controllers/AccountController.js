@@ -1,6 +1,5 @@
-const mongoose = require('mongoose');//*Importa o mongoose
-mongoose.connect('mongodb://localhost:27017/apiFinanceira');//*Conecta o mongoose com o mongodb
 const AccountService = require('../services/Account/AccountService');
+
 
 class AccountController {//*É uma classe que tem todas a funcion de account
     async createAccount(req, res) {//*Create account 
@@ -146,4 +145,4 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     };
 }      
 
-module.exports = new AccountController();3
+module.exports = new AccountController();

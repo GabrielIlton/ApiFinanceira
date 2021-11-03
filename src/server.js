@@ -46,9 +46,4 @@ app.listen(3333,() => {
 //     °500 - Internal Server Error
 //     °502 - Bad Gateway
 
-
-// app.get("/", (req, res) => {// EH O REQUERIMENTO E A RESPOSTA
-//     return res.json({ message: "Hello World!  " }); //? RETORNA QUALQUER COISA EM JSON
-// });
-
 // //todo: splice altera o conteudo, add conteudo novo e remove o velho

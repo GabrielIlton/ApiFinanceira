@@ -2,7 +2,7 @@ const { Router } = require('express');
 const router = Router();
 const AccountController = require('../controllers/AccountController');
 const StatementController = require('../controllers/StatementController');
-const Image = require('../controllers/ImageController');
+const ImageController = require('../controllers/ImageController');
 const Auth = require('../middlewares/Auth');
 const Login = require('../middlewares/Login');
 const multer = require('multer');
@@ -22,9 +22,9 @@ router.get("/accounts/list", Auth.userAuth, AccountController.getAccounts);
 
 router.put("/password", Auth.userAuth, AccountController.updatePasswordAccount);
 
-router.post("/image", Auth.userAuth, multer(multerConfig).single('file'), Image.uploadImage);
+router.post("/image", Auth.userAuth, multer(multerConfig).single('file'), ImageController.uploadImage);
 
-router.delete("/image", Auth.userAuth, Image.deleteImage);
+router.delete("/image", Auth.userAuth, ImageController.deleteImage);
 
 router.delete("/delete", Auth.userAuth, AccountController.deleteAccount);
 

@@ -1,7 +1,3 @@
-const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/apiFinanceira');
-
-
 function validateEmail(email) {
     const validator = /\S+@\S+\.\S+/;
     return validator.test(email);
