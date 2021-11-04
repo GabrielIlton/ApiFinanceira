@@ -1,8 +1,8 @@
-const StatementModel = require('../../models/statement');
+const Models = require('../../models/index');
 
 class StatementRepository {
     async depositCreateStatement ({ deposit, token }) {
-        const depositStatement = await StatementModel.create({
+        const depositStatement = await Models.StatementModel.create({
             type: 'deposit',
             amount: deposit,
             accountId: token.account_id
@@ -11,7 +11,7 @@ class StatementRepository {
     }
 
     async withDrawCreateStatement ({ withDraw, token }) {
-        const withDrawStatement = await StatementModel.create({
+        const withDrawStatement = await Models.StatementModel.create({
             type: 'withDraw',
             amount: withDraw,
             accountId: token.account_id
@@ -20,7 +20,7 @@ class StatementRepository {
     }
 
     async P2PcashoutCreate ({ amount, accountSend }) {
-        return await StatementModel.create({
+        return await Models.StatementModel.create({
             type:'cashoutP2P',
             amount: amount,    
             accountId: accountSend._id
@@ -28,7 +28,7 @@ class StatementRepository {
     }
 
     async P2PcashinCreate ({ amount, accountReciever }) {
-        return await StatementModel.create({ 
+        return await Models.StatementModel.create({ 
             type:'cashinP2P',
             amount: amount, 
             accountId: accountReciever._id
@@ -36,16 +36,16 @@ class StatementRepository {
     }
 
     async findByIdListStatements ({ id }) {
-        return await StatementModel.find({ accountId: id });
+        return await Models.StatementModel.find({ accountId: id });
     }
 
     async findByDateStatements ({ condition }) {
-        const statement = await StatementModel.find(condition)
+        const statement = await Models.StatementModel.find(condition)
         return statement;
     }
 
     async findAllStatements ({}) {
-        return await StatementModel.find({})
+        return await Models.StatementModel.find({})
     }
 }
 

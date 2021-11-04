@@ -1,10 +1,10 @@
-const AccountService = require('../services/Account/AccountService');
+const Services = require('../services/index');
 
 
 class AccountController {//*É uma classe que tem todas a funcion de account
     async createAccount(req, res) {//*Create account 
         try {            
-            const accountCreated = await AccountService.createAccount({ body: req.body })
+            const accountCreated = await Services.AccountService.createAccount({ body: req.body })
         
             return res.status(201).json({ nome: accountCreated.name, email: accountCreated.email });
        }catch(error){
@@ -15,7 +15,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async loginAccount(req, res){//*Login account created
         try {
             const { account } = res.login;
-            const token = await AccountService.loginAccount({ account });
+            const token = await Services.AccountService.loginAccount({ account });
             
             return res.status(200).json({ name: account.name, token });
     
@@ -27,7 +27,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async getAccountDetails (req, res) {//*Find one account
         try {            
             const { token } = res.auth;
-            const account = await AccountService.getAccountDetails({ token })
+            const account = await Services.AccountService.getAccountDetails({ token })
          
             const finalReturn = { 
                 name: account.name,
@@ -51,7 +51,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async getSaldo (req, res) {//*Find balance account
         try {
             const { token } = res.auth;
-            const account = await AccountService.getSaldo({ token });
+            const account = await Services.AccountService.getSaldo({ token });
             return res.status(200).json({ Nome: account.name, Balance: account.balance });
           
         } catch (error) {
@@ -62,7 +62,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async getAccounts (req, res) {//*Find all accounts
         try {   
             const { token } = res.auth;
-            const accounts = await AccountService.getAccounts({ token });
+            const accounts = await Services.AccountService.getAccounts({ token });
             const finalReturn = accounts.map(account => ({ 
                 name: account.name,
                 cpf: account.cpf,
@@ -83,7 +83,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         try {            
             const { token } = res.auth;
 
-            const account = await AccountService.updatePasswordAccount({ body: req.body, token })
+            const account = await Services.AccountService.updatePasswordAccount({ body: req.body, token })
             return res.status(200).json({name: account.name, message: "Senha alterada com sucesso."});//*Retorna o status de sucesso
         } catch (error) {
             return res.status(400).json({error});//*Retorna o status de erro   
@@ -93,7 +93,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async deleteAccount (req, res) {//*Delete account
         try {   
             const { token } = res.auth;
-            const account = await AccountService.deleteAccount({ body: req.body, token })
+            const account = await Services.AccountService.deleteAccount({ body: req.body, token })
 
             return res.status(200).json({deleted: account.name, message: 'Deletado com sucesso.'});
         } catch (error) {
@@ -103,7 +103,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
 
     async retrieveAccount(req, res){//*Retrieve a conta caso esteja excluida 
         try {           
-            const account = await AccountService.retrieveAccount({ body: req.body });
+            const account = await Services.AccountService.retrieveAccount({ body: req.body });
             return res.status(200).json({ name: account.name, message: 'Conta recuperada com sucesso.' });
         } catch (error) {
             return res.status(400).json({error})
@@ -113,7 +113,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async depositAccount (req, res) { //*Deposit in account  
         try {   
             const { token } = res.auth;            
-            const account = await AccountService.depositAccount({ body: req.body, token })
+            const account = await Services.AccountService.depositAccount({ body: req.body, token })
             
             return res.status(201).json({ name: account.name, saldo: account.balance });
         
@@ -125,7 +125,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async withdrawAccount (req, res) {//*WithDraw in account 
         try {
             const { token } = res.auth;            
-            const account = await AccountService.withDrawAccount({ body: req.body, token })
+            const account = await Services.AccountService.withDrawAccount({ body: req.body, token })
             return res.status(201).json({ nome: account.name, saque: req.body.withDraw, saldo: account.balance });
         } catch (error) {
             return res.status(400).json({message: error.message});//?Retorna o status
@@ -136,7 +136,7 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         try {
             const { token } = res.auth;
             
-            const { accountSend, accountReciever } = await AccountService.p2p({ body: req.body, token });
+            const { accountSend, accountReciever } = await Services.AccountService.p2p({ body: req.body, token });
 
             return res.status(200).json({ accountSend: accountSend.name, cashout: req.body.amount, saldo: accountSend.balance - req.body.amount, accountReciever: accountReciever.name, cashin: accountReciever.balance + req.body.amount });//!ACERTAR
         } catch (error) {

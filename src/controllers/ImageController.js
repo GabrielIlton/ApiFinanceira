@@ -1,11 +1,11 @@
-const ImageService = require('../services/UploadImage/ImageService');
+const Services = require('../services/index');
 
 class Image {
     async uploadImage(req, res){
         try {
             const { token } = res.auth;
 
-            const imageUpload = await ImageService.uploadImage({ token, file: req.file })
+            const imageUpload = await Services.ImageService.uploadImage({ token, file: req.file })
        
             return res.status(200).json({ name: imageUpload.name, size: imageUpload.size });
 
@@ -19,7 +19,7 @@ class Image {
         try {
             const { token } = res.auth;
             
-            const imageDeleted = await ImageService.deleteImage({ token })
+            const imageDeleted = await Services.ImageService.deleteImage({ token })
 
             return res.status(200).json({ message: 'Sua imagem foi deletada com sucesso.' });
         } catch (error) {

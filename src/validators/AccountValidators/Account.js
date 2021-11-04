@@ -23,6 +23,10 @@ class AccountValidator {
         if(!body.passwordNew) throw 'Senha nova é obrigatória.';
     };
 
+    async deleteAccountValidator(body) {
+        if(!body.cpf) throw 'Passe um CPF para deleção da conta.';
+    };
+
     async retrieveAccountValidator(body) {
         if(!body.cpf) throw 'CPF é obrigatório.';
     };

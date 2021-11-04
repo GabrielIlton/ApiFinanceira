@@ -1,11 +1,11 @@
-const StatementService = require('../services/Statement/StatementService');
+const Services = require('../services/index');
 
 
 class StatementController { 
     async listOneAccountStatement (req, res) {
         try {
             const { token } = res.auth;
-            const accountStatement = await StatementService.listOneAccountStatement({ token });
+            const accountStatement = await Services.StatementService.listOneAccountStatement({ token });
             const finalReturn = accountStatement.map(account => ({ 
                 amount: account.amount,
                 type: account.type,
@@ -21,7 +21,7 @@ class StatementController {
         try {
             const { token } = res.auth;
        
-            const statements = await StatementService.statementByDate({ token, query: req.query });
+            const statements = await Services.StatementService.statementByDate({ token, query: req.query });
             
             const finalReturn = statements.map(account => ({ 
                 amount: account.amount,
@@ -39,7 +39,7 @@ class StatementController {
         try {
             const { token } = res.auth;
            
-            const statements = await StatementService.listAllStatements({ token });
+            const statements = await Services.StatementService.listAllStatements({ token });
             const finalReturn = statements.map(account => ({ 
                 accountId: account.accountId,
                 amount: account.amount,

@@ -1,52 +1,42 @@
 const { Router } = require('express');
 const router = Router();
-const AccountController = require('../controllers/AccountController');
-const StatementController = require('../controllers/StatementController');
-const ImageController = require('../controllers/ImageController');
-const Auth = require('../middlewares/Auth');
-const Login = require('../middlewares/Login');
+const Controllers = require('../controllers/index');
+const Middlewares = require('../middlewares/index');
 const multer = require('multer');
-const multerConfig = require('../config/multer');
+const Config = require('../config/index');
+
 
 //!SÃO TODAS AS ROTAS DA APLICAÇÃO
-      
-router.post("/create", AccountController.createAccount);
+router.post("/create", Controllers.AccountController.createAccount);
 
-router.post("/login", Login.userLogin, AccountController.loginAccount);
+router.post("/login", Middlewares.Login.userLogin, Controllers.AccountController.loginAccount);
 
-router.get("/details", Auth.userAuth, AccountController.getAccountDetails);
+router.get("/details", Middlewares.Auth.userAuth, Controllers.AccountController.getAccountDetails);
 
-router.get("/balance", Auth.userAuth, AccountController.getSaldo);
+router.get("/balance", Middlewares.Auth.userAuth, Controllers.AccountController.getSaldo);
 
-router.get("/accounts/list", Auth.userAuth, AccountController.getAccounts);
+router.get("/accounts/list", Middlewares.Auth.userAuth, Controllers.AccountController.getAccounts);
 
-router.put("/password", Auth.userAuth, AccountController.updatePasswordAccount);
+router.put("/password", Middlewares.Auth.userAuth, Controllers.AccountController.updatePasswordAccount);
 
-router.post("/image", Auth.userAuth, multer(multerConfig).single('file'), ImageController.uploadImage);
+router.post("/image", Middlewares.Auth.userAuth, multer(Config.multerConfig).single('file'), Controllers.ImageController.uploadImage);
 
-router.delete("/image", Auth.userAuth, ImageController.deleteImage);
+router.delete("/image", Middlewares.Auth.userAuth, Controllers.ImageController.deleteImage);
 
-router.delete("/delete", Auth.userAuth, AccountController.deleteAccount);
+router.delete("/delete", Middlewares.Auth.userAuth, Controllers.AccountController.deleteAccount);
 
-router.put("/retrieve", AccountController.retrieveAccount);
+router.put("/retrieve", Controllers.AccountController.retrieveAccount);
 
-router.get("/statement", Auth.userAuth, StatementController.listOneAccountStatement);
+router.get("/statement", Middlewares.Auth.userAuth, Controllers.StatementController.listOneAccountStatement);
 
-router.get("/statementByDate", Auth.userAuth, StatementController.statementByDate);
+router.get("/statementByDate", Middlewares.Auth.userAuth, Controllers.StatementController.statementByDate);
 
-router.get("/statement/list", Auth.userAuth, StatementController.listAllStatement);
+router.get("/statement/list", Middlewares.Auth.userAuth, Controllers.StatementController.listAllStatement);
 
-router.post("/deposit", Auth.userAuth, AccountController.depositAccount);
+router.post("/deposit", Middlewares.Auth.userAuth, Controllers.AccountController.depositAccount);
 
-router.post("/withdraw", Auth.userAuth, AccountController.withdrawAccount);
+router.post("/withdraw", Middlewares.Auth.userAuth, Controllers.AccountController.withdrawAccount);
 
-router.post("/p2p", Auth.userAuth, AccountController.p2p);
+router.post("/p2p", Middlewares.Auth.userAuth, Controllers.AccountController.p2p);
 
 module.exports = router;
-
-/** Tipos de parametros
- * 
- * Route Params => Identificar um recurso editar/deletar/buscar
- * Query Params => Paginação / Filtro
- * Body Params => Os objetos inserção/alteração (JSON)
- */

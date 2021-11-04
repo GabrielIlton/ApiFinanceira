@@ -1,12 +1,12 @@
 const bcrypt = require('bcryptjs');
-const AccountRepository = require('../repositories/Account/AccountRepository');
+const Repositories = require('../repositories/index');
 
 
 class AuthMiddlewares {
     async userLogin (req, res, next) {
         try {
             const login = req.body;
-            const account = await AccountRepository.findByDocumentEmail({ email: login.email });
+            const account = await Repositories.AccountRepository.findByDocumentEmail({ email: login.email });
             if(!account) throw 'Conta não existe.';
             const passwordCorrect = await bcrypt.compare(login.password, account.password);
             if(!passwordCorrect) throw 'Senha incorreta.';
