@@ -39,4 +39,6 @@ router.post("/withdraw", Middlewares.Auth.userAuth, Controllers.AccountControlle
 
 router.post("/p2p", Middlewares.Auth.userAuth, Controllers.AccountController.p2p);
 
+router.post("/callbackp2p", Controllers.AccountController.callbackp2p);
+
 module.exports = router;

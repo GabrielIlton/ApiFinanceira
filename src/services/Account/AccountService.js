@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');//*Importa o jsonwebtoken
 const authConfig = require('../../config/auth');//*Importa o authConfig
 const bcrypt = require('bcryptjs');//*Importa o bcryptjs
 const Repositories = require('../../repositories/index');
+const axios = require('axios');
 
 
 class AccountService {
@@ -26,7 +27,7 @@ class AccountService {
         }, 
             authConfig.secret, 
         {
-            expiresIn: '1h'
+            expiresIn: authConfig.expires
         });
         return token;
     }
@@ -131,20 +132,25 @@ class AccountService {
 
         const totalSend = accountSend.balance - body.amount;
         const accountIdSend = await Repositories.AccountRepository.findByDocumentCpf({ cpf: accountSend.cpf });
-        await Repositories.AccountRepository.findOneAndUpdateBalance({ id: accountIdSend._id.toString(), total: totalSend });
 
+        await Repositories.AccountRepository.findOneAndUpdateBalance({ id: accountIdSend._id.toString(), total: totalSend });
         await Repositories.TransactionRepository.P2Pcashin({ accountReciever, amount: body.amount });
 
         const totalReciever = body.amount + accountReciever.balance;
         const accountIdReciever = await Repositories.AccountRepository.findByDocumentCpf({ cpf: body.cpfReciever });
+
         await Repositories.AccountRepository.findOneAndUpdateBalance({ id: accountIdReciever._id.toString(), total: totalReciever });
+        await Repositories.StatementRepository.P2PcashoutCreate({ amount: body.amount, accountSend });
+        await Repositories.StatementRepository.P2PcashinCreate({ amount: body.amount, accountReciever });
 
-        await Repositories.StatementRepository.P2PcashoutCreate({ amount: body.amount, accountSend })
-        await Repositories.StatementRepository.P2PcashinCreate({ amount: body.amount, accountReciever })
+        const response = await axios({
+            method: 'post',
+            url: "http://localhost:8080/webhookp2p", 
+            data: accountSend 
+        });
+        if(!response) throw 'Falha ao realizar a transação.';
 
-
-        return { accountSend, accountReciever };
-
+        return { accountSend, accountReciever, response };
     }
 }
 

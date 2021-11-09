@@ -1,5 +1,5 @@
 const Services = require('../services/index');
-
+const axios = require('axios');
 
 class AccountController {//*É uma classe que tem todas a funcion de account
     async createAccount(req, res) {//*Create account 
@@ -135,13 +135,21 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async p2p (req, res) {//*P2P
         try {
             const { token } = res.auth;
-            
-            const { accountSend, accountReciever } = await Services.AccountService.p2p({ body: req.body, token });
+            const { accountSend, accountReciever, response } = await Services.AccountService.p2p({ body: req.body, token });
 
-            return res.status(200).json({ accountSend: accountSend.name, cashout: req.body.amount, saldo: accountSend.balance - req.body.amount, accountReciever: accountReciever.name, cashin: accountReciever.balance + req.body.amount });//!ACERTAR
+            return res.status(200).json({ accountSend: accountSend.name, cashout: req.body.amount, saldo: accountSend.balance - req.body.amount, accountReciever: accountReciever.name, cashin: req.body.amount, response: response.data });//!ACERTAR
         } catch (error) {
             return res.status(400).json({ message: error });//?Retorna o status
         }
+    };
+
+    async callbackp2p (req, res) {
+        try {
+            return res.status(200).json({ Sucesso: `${req.body.name}, sua transação foi realizada com sucesso.` });
+        } catch (error) {
+            return res.status(400).json({ message: error })
+        }
+
     };
 }      
 
