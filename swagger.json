@@ -639,7 +639,7 @@
             "post": {
                 "tags": ["Transaction"],
                 "summary": "Realiza a transação.",
-                "description": "Realiza a transação de uma conta para outra, subtraindo o saldo na conta de envio e adicionando no saldo da conta que recebe, para realizar a transferência é preciso o token no Headers, que será quem envia, e o CPF no corpo da requisição que será quem vai receber a transferência.",
+                "description": "Realiza a transação de uma conta para outra, subtraindo o saldo na conta de envio e adicionando no saldo da conta que recebe, para realizar a transferência é preciso o token no Headers, que será quem envia, e o CPF no corpo da requisição que será quem vai receber a transferência. Essa rota consome uma API para retornar o sucesso na transferência.",
                 "security": [
                     {
                         "bearerAuth": []
@@ -677,7 +677,8 @@
                                             "cashout": "Valor que está saindo da conta de 'accountSend'.",
                                             "saldo": "Saldo da conta do enviador após a transação.",
                                             "accountReciever": "Nome da conta que está recebendo a transferência.",
-                                            "cashin": "Valor que está entrando na conta do 'accountReciever'."
+                                            "cashin": "Valor que está entrando na conta do 'accountReciever'.",
+                                            "response": "'Nome de quem transferiu', e uma mensagem de sucesso."
                                         }
                                     }
                                 }

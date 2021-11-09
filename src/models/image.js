@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { model, Schema } = require('mongoose');
 const fs = require('fs');
 const path = require('path');
@@ -36,7 +37,7 @@ const ImageSchema = new Schema({
 
 ImageSchema.pre('save', async function(next){  
     if(!this.url || this.url) {
-        this.url = `http://localhost:3333/image/${this.key}`
+        this.url = `${process.env.APP_URL}/image/${this.key}`
     }
     next()
 });

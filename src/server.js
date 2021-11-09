@@ -1,5 +1,6 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/apiFinanceira', { useNewUrlParser: true });
+mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true });
 const express = require('express');
 const routes = require('./routes/routes');
 const swaggerUi = require('swagger-ui-express'); 

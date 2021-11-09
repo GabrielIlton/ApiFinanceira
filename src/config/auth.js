@@ -1,6 +1,8 @@
+require('dotenv').config();
+
 const auth ={
-    secret:"ff0a3a2bbaf56b160c3814ef40df22cf",
-    expires:"90m"
+    secret: process.env.TOKEN_SECRET,
+    expires: process.env.TOKEN_EXPIRES
 };
 
 module.exports = auth;

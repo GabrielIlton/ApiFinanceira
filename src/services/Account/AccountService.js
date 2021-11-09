@@ -145,7 +145,7 @@ class AccountService {
 
         const response = await axios({
             method: 'post',
-            url: "http://localhost:8080/webhookp2p", 
+            url: `${process.env.WEBHOOKP2P_URL}`, 
             data: accountSend 
         });
         if(!response) throw 'Falha ao realizar a transação.';

@@ -1,5 +1,4 @@
 const Services = require('../services/index');
-const axios = require('axios');
 
 class AccountController {//*É uma classe que tem todas a funcion de account
     async createAccount(req, res) {//*Create account 
