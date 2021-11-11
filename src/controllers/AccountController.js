@@ -78,6 +78,19 @@ class AccountController {//*É uma classe que tem todas a funcion de account
         }
     };
     
+    async createPasswordSecurity(req, res) {
+        try {
+            const { token } = res.auth;
+
+            const accountLoginSecurity = await Services.AccountService.accountLoginSecurity({ token, body: req.body });
+
+            return res.status(200).json({ message: "Sucesso ao criar senha de segurança." });
+
+        } catch (error) {
+            return res.status(400).json({ error });
+        }
+    };
+    
     async updatePasswordAccount (req,res) {//*Put o password
         try {            
             const { token } = res.auth;
@@ -124,19 +137,19 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async withdrawAccount (req, res) {//*WithDraw in account 
         try {
             const { token } = res.auth;            
-            const account = await Services.AccountService.withDrawAccount({ body: req.body, token })
-            return res.status(201).json({ nome: account.name, saque: req.body.withDraw, saldo: account.balance });
+            const returnFinal = await Services.AccountService.withDrawAccount({ body: req.body, token });
+            return res.status(201).json({ nome: returnFinal.account.name, saque: req.body.withDraw });
         } catch (error) {
-            return res.status(400).json({message: error.message});//?Retorna o status
+            return res.status(400).json({ message: error });//?Retorna o status
         }
     };
 
     async p2p (req, res) {//*P2P
         try {
             const { token } = res.auth;
-            const { accountSend, accountReciever, response } = await Services.AccountService.p2p({ body: req.body, token });
+            const { accountSend, accountReciever, response, balance } = await Services.AccountService.p2p({ body: req.body, token });
 
-            return res.status(200).json({ accountSend: accountSend.name, cashout: req.body.amount, saldo: accountSend.balance - req.body.amount, accountReciever: accountReciever.name, cashin: req.body.amount, response: response.data });//!ACERTAR
+            return res.status(200).json({ accountSend: accountSend.name, cashout: req.body.amount, saldo: balance, accountReciever: accountReciever.name, cashin: req.body.amount, response: response.data });
         } catch (error) {
             return res.status(400).json({ message: error });//?Retorna o status
         }

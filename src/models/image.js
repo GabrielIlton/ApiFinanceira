@@ -32,7 +32,7 @@ const ImageSchema = new Schema({
     deleted: {
         type: Boolean,
         default: false
-    }
+    },
 });
 
 ImageSchema.pre('save', async function(next){  

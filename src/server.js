@@ -4,7 +4,7 @@ mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true });
 const express = require('express');
 const routes = require('./routes/routes');
 const swaggerUi = require('swagger-ui-express'); 
-const swaggerDocs = require('../swagger.json')
+const swaggerDocs = require('../swagger.json');
 const morgan = require('morgan');
 const path = require('path');
 

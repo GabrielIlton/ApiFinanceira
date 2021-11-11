@@ -17,6 +17,8 @@ router.get("/balance", Middlewares.Auth.userAuth, Controllers.AccountController.
 
 router.get("/accounts/list", Middlewares.Auth.userAuth, Controllers.AccountController.getAccounts);
 
+router.post("/passwordsecurity", Middlewares.Auth.userAuth, Controllers.AccountController.createPasswordSecurity);
+
 router.put("/password", Middlewares.Auth.userAuth, Controllers.AccountController.updatePasswordAccount);
 
 router.post("/image", Middlewares.Auth.userAuth, multer(Config.multerConfig).single('file'), Controllers.ImageController.uploadImage);

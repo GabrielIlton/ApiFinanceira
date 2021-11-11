@@ -9,6 +9,7 @@ const AccountSchema = new Schema({
      },
      cpf: {
           type: Number,
+          unique: true,
           required: true,  
      },
      email: {
@@ -20,6 +21,16 @@ const AccountSchema = new Schema({
      password: {
           type: String,
           required: true
+     },
+     passwordSecurity: {
+          type: String,
+          required: false,
+          default: ''
+     },
+     valueSecurity: {
+          type: Number,
+          required: false,
+          default: 0
      },
      endereco: new Schema ({
           rua:{ type: String, required: true },
@@ -50,5 +61,6 @@ AccountSchema.pre('save', async function(next){
      this.password = hash;    
      next();
 });
+
 
 module.exports = model('Account', AccountSchema);

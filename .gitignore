@@ -7,3 +7,13 @@ tmp
 package-lock.json
 
 yarn.lock
+
+jest.config.js
+
+__test__
+
+.vscode
+
+coverage
+
+app.js

@@ -7,16 +7,15 @@ const TransactionAccount = new Schema({
     },
     type:{
         type: String,
-        enum: ['cashout', 'cashin']
+        enum: ['cashout', 'cashin', 'cashoutSecurity', 'cashinSecurity']
     },
     accountId: {
         type: String,
         required: true,
-    }
+    },
 },
 {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
-}
-)
+})
 
 module.exports = model('Transaction', TransactionAccount);
