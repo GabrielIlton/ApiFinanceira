@@ -7,7 +7,7 @@ const StatementAccount = new Schema({
     },
     type:{
         type: String,
-        enum: ['deposit', 'withDraw', 'cashoutP2P', 'cashinP2P', "cashoutP2PSecurity", "cashinP2PSecurity"]
+        enum: ['deposit', 'withDraw', 'withDrawSecurity', 'cashoutP2P', 'cashinP2P', 'cashoutP2PSecurity', 'cashinP2PSecurity']
     },
     accountId: {
         type: String,

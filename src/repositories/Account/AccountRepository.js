@@ -22,8 +22,12 @@ class AccountRepository {
         });
     };
 
-    async createSecurity ({ id, passwordSecurity, valueSecurity }) {
-        return await Models.AccountModel.findOneAndUpdate({ _id: id,  }, { passwordSecurity, valueSecurity });
+    async createSecurity ({ id, passwordSecurity }) {
+        return await Models.AccountModel.findOneAndUpdate({ _id: id,  }, { passwordSecurity });
+    };
+
+    async updateBalanceSecurity ({ id, balanceSecurity }) {
+        return await Models.AccountModel.findOneAndUpdate({ _id: id,  }, { balanceSecurity });
     };
 
     async findByAccountDeletedTrue ({ cpf }) {

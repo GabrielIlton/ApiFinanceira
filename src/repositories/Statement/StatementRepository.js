@@ -19,6 +19,15 @@ class StatementRepository {
         return withDrawStatement;
     };
 
+    async withDrawCreateStatementSecurity ({ withDraw, token }) {
+        const withDrawStatement = await Models.StatementModel.create({
+            type: 'withDrawSecurity',
+            amount: withDraw,
+            accountId: token.account_id
+        });
+        return withDrawStatement;
+    };
+
     async P2PcashoutCreate ({ amount, accountSend }) {
         return await Models.StatementModel.create({
             type:'cashoutP2P',

@@ -27,7 +27,7 @@ const AccountSchema = new Schema({
           required: false,
           default: ''
      },
-     valueSecurity: {
+     balanceSecurity: {
           type: Number,
           required: false,
           default: 0

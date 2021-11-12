@@ -26,7 +26,6 @@ class AccountValidator {
 
     async loginSecurity(body) {
         if(!body.passwordSecurity) throw 'Senha de segurança é obrigatória.';
-        if(!body.valueSecurity) throw 'Valor de segurança é obrigatório.';
         if(body.passwordSecurity.length != 6 ) throw 'Senha deve conter 6 caracteres.';
     };
 

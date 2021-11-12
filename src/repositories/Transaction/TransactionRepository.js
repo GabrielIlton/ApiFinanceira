@@ -31,6 +31,11 @@ class TransactionRepository {
             accountId: accountReciever._id
         });
     };
+
+    async findByDateTransactions ({ condition }) {
+        const transaction = await Models.TransactionModel.find(condition)
+        return transaction;
+    };
 }
 
 module.exports = new TransactionRepository();

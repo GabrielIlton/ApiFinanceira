@@ -26,8 +26,8 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async getAccountDetails (req, res) {//*Find one account
         try {            
             const { token } = res.auth;
-            const account = await Services.AccountService.getAccountDetails({ token })
-         
+            const account = await Services.AccountService.getAccountDetails({ token });
+
             const finalReturn = { 
                 name: account.name,
                 cpf: account.cpf,
@@ -41,7 +41,11 @@ class AccountController {//*É uma classe que tem todas a funcion de account
                 admin: account.admin
             };
 
-            return res.status(200).json({ finalReturn });
+            if(token.password){
+                return res.status(200).json({ finalReturn });
+            };
+
+            return res.status(200).json({ name: finalReturn.name, email: finalReturn.email });  
         }catch (error) {
             return res.status(400).json({error});   
         }
@@ -50,18 +54,27 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async getSaldo (req, res) {//*Find balance account
         try {
             const { token } = res.auth;
-            const account = await Services.AccountService.getSaldo({ token });
-            return res.status(200).json({ Nome: account.name, Balance: account.balance });
+            const returnFinal = await Services.AccountService.getSaldo({ token });
+            return res.status(200).json({ Nome: returnFinal.account.name, Balance: returnFinal.balance });
           
         } catch (error) {
-            return res.status(404).json({message: error});
+            return res.status(404).json({ message: error });
         };
     };
 
     async getAccounts (req, res) {//*Find all accounts
         try {   
             const { token } = res.auth;
-            const accounts = await Services.AccountService.getAccounts({ token });
+            const accounts = await Services.AccountService.getAccounts({ token });            
+            
+            if(token.passwordSecurity){
+                const finalReturn = accounts.map(account => ({ 
+                    name: account.name,
+                    email: account.email
+                }));
+                return res.status(200).json({ finalReturn });
+            }
+            
             const finalReturn = accounts.map(account => ({ 
                 name: account.name,
                 cpf: account.cpf,
@@ -72,20 +85,20 @@ class AccountController {//*É uma classe que tem todas a funcion de account
                 balance: account.balance,
                 admin: account.admin
             }));
+            
             return res.status(200).json({ finalReturn });
         }catch (error) {
             return res.status(400).json({message: error});   
         }
     };
     
-    async createPasswordSecurity(req, res) {
+    async createLoginSecurity(req, res) {
         try {
             const { token } = res.auth;
 
-            const accountLoginSecurity = await Services.AccountService.accountLoginSecurity({ token, body: req.body });
+            await Services.AccountService.accountLoginSecurity({ token, body: req.body });
 
             return res.status(200).json({ message: "Sucesso ao criar senha de segurança." });
-
         } catch (error) {
             return res.status(400).json({ error });
         }
@@ -137,8 +150,8 @@ class AccountController {//*É uma classe que tem todas a funcion de account
     async withdrawAccount (req, res) {//*WithDraw in account 
         try {
             const { token } = res.auth;            
-            const returnFinal = await Services.AccountService.withDrawAccount({ body: req.body, token });
-            return res.status(201).json({ nome: returnFinal.account.name, saque: req.body.withDraw });
+            const account = await Services.AccountService.withDrawAccount({ body: req.body, token });
+            return res.status(201).json({ nome: account.name, saque: req.body.withDraw });
         } catch (error) {
             return res.status(400).json({ message: error });//?Retorna o status
         }

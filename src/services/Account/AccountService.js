@@ -4,7 +4,6 @@ const authConfig = require('../../config/auth');//*Importa o authConfig
 const bcrypt = require('bcryptjs');//*Importa o bcryptjs
 const Repositories = require('../../repositories/index');
 const axios = require('axios');
-const account = require('../../models/account');
 
 
 class AccountService {
@@ -39,7 +38,12 @@ class AccountService {
     };
 
     async getSaldo ({ token }) {
-        return await Repositories.AccountRepository.findById({ id: token.account_id });   
+        const account = await Repositories.AccountRepository.findById({ id: token.account_id }); 
+        if(token.password) {
+            return { account, balance: account.balance };
+        } else {
+            return { account, balance: account.balanceSecurity };
+        }  
     };
 
     async getAccounts ({ token }) {
@@ -50,23 +54,21 @@ class AccountService {
     };
 
     async accountLoginSecurity ({ token, body }) {
-        if(token.passwordSecurity) throw 'Você não tem acesso.';
+        if(token.passwordSecurity) throw 'Não foi possível acessar esse comando.';
         await Validators.AccountValidators.loginSecurity(body);
-
         const account = await Repositories.AccountRepository.findById({ id: token.account_id });
-        if(account.passwordSecurity && account.valueSecurity) throw 'Você já possui uma senha e valor de segurança.';
-
-        const valueSecurity = (account.balance / 100) * 20;
-        if(body.valueSecurity > valueSecurity) throw 'Seu valor de segurança deve ser pelo menos 20% do seu saldo.';
-
+        if(!account.passwordSecurity) throw 'Você já possui uma senha de segurança.' 
+        if(account.passwordSecurity && account.balanceSecurity) throw 'Você já possui uma senha e valor de segurança.';
         const passwordSecurity = await bcrypt.hash(body.passwordSecurity, 10);
-        const createSecurity = await Repositories.AccountRepository.createSecurity({ id: account._id, passwordSecurity, valueSecurity: body.valueSecurity });
+        const createSecurity = await Repositories.AccountRepository.createSecurity({ id: account._id, passwordSecurity });
         if(!createSecurity) throw 'Não foi possível criar sua senha e valor de segurança.';
         
         return createSecurity;
     };
 
     async updatePasswordAccount ({ body, token }) {
+        if(token.passwordSecurity) throw 'Não é possível alterar senha no momento.';
+
         await Validators.AccountValidators.updatePasswordAccountValidator( body );
 
         const verifyEmail = await Repositories.AccountRepository.findByDocumentEmail({ email: body.email });
@@ -83,6 +85,11 @@ class AccountService {
     };
 
     async deleteAccount ({ body, token }) {
+        if(token.passwordSecurity) {
+            const messageFake = 'Deletado com sucesso' 
+            return messageFake;
+        };
+
         if(token.admin === true) {
             await Validators.AccountValidators.deleteAccountValidator( body );
             const findCpf = await Repositories.AccountRepository.findByDocumentCpf({ cpf: body.cpf });
@@ -136,17 +143,18 @@ class AccountService {
                 throw "Saldo insuficiente.";
             };
        };
+
        if(token.passwordSecurity){
-            await Validators.AccountValidators.withdrawAccountValidator(body);//!Validators
+            await Validators.AccountValidators.withdrawAccountValidator(body);
             const account = await Repositories.AccountRepository.findById({ id: token.account_id });
 
-            const balanceSecurity = (account.balance / 100) * 20;
-
-            if(body.withDraw <= balanceSecurity){
-                await Repositories.StatementRepository.withDrawCreateStatement({ withDraw: body.withDraw, token });
+            if(body.withDraw <= account.balanceSecurity){
+                const balanceSecurity = account.balanceSecurity - body.withDraw;
+                await Repositories.AccountRepository.updateBalanceSecurity({ id: account._id, balanceSecurity }); 
+                await Repositories.StatementRepository.withDrawCreateStatementSecurity({ withDraw: body.withDraw, token });
                 const total = account.balance - body.withDraw;
-                const withDrawAccount = await Repositories.AccountRepository.findOneAndUpdateBalance({ id: token.account_id, total });
-                return { account, balanceSecurity };
+                await Repositories.AccountRepository.findOneAndUpdateBalance({ id: token.account_id, total });
+                return { account };
             } else{
                 throw 'Saldo insuficiente.';
             };
@@ -167,15 +175,13 @@ class AccountService {
             await Repositories.TransactionRepository.P2Pcashout({ accountSend, amount: body.amount });
     
             const totalSend = accountSend.balance - body.amount;
-            const accountIdSend = await Repositories.AccountRepository.findByDocumentCpf({ cpf: accountSend.cpf });
     
-            await Repositories.AccountRepository.findOneAndUpdateBalance({ id: accountIdSend._id.toString(), total: totalSend });
+            await Repositories.AccountRepository.findOneAndUpdateBalance({ id: accountSend._id.toString(), total: totalSend });
             await Repositories.TransactionRepository.P2Pcashin({ accountReciever, amount: body.amount });
     
             const totalReciever = body.amount + accountReciever.balance;
-            const accountIdReciever = await Repositories.AccountRepository.findByDocumentCpf({ cpf: body.cpfReciever });
     
-            await Repositories.AccountRepository.findOneAndUpdateBalance({ id: accountIdReciever._id.toString(), total: totalReciever });
+            await Repositories.AccountRepository.findOneAndUpdateBalance({ id: accountReciever._id.toString(), total: totalReciever });
             await Repositories.StatementRepository.P2PcashoutCreate({ amount: body.amount, accountSend });
             await Repositories.StatementRepository.P2PcashinCreate({ amount: body.amount, accountReciever });
 
@@ -193,11 +199,13 @@ class AccountService {
             const accountReciever = await Repositories.AccountRepository.findByDocumentCpf({ cpf: body.cpfReciever });
             const accountSend = await Repositories.AccountRepository.findById({ id: token.account_id });
 
-            const p2pSecurity = accountSend.valueSecurity;
-            
             if(!accountReciever) throw 'Conta de destinatário não existe';
-            if(p2pSecurity < body.amount) throw 'Não tem saldo suficiente para a transação.';
+            if(accountSend.balanceSecurity < body.amount) throw 'Não tem saldo suficiente para a transação.';
+            if(body.amount > accountSend.balance) throw 'Não tem saldo suficiente para a transação.';
             if(token.account_id === accountReciever.id) throw 'Não pode fazer a transferência para si mesmo.';
+            
+            const balanceSecurity = accountSend.balanceSecurity - body.amount;
+            await Repositories.AccountRepository.updateBalanceSecurity({ id: accountSend._id, balanceSecurity });
 
             await Repositories.TransactionRepository.P2PcashoutSecurity({ accountSend, amount: body.amount });
 
@@ -219,7 +227,7 @@ class AccountService {
             });
             if(!response) throw 'Falha ao enviar mensagem da transação realizada com sucesso.';
     
-            return { accountSend, accountReciever, response, balance: p2pSecurity - body.amount };
+            return { accountSend, accountReciever, response, balance: balanceSecurity };
         };
     };
 }
