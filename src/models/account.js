@@ -25,19 +25,19 @@ const AccountSchema = new Schema({
      passwordSecurity: {
           type: String,
           required: false,
-          default: ''
+          default: ""
      },
      balanceSecurity: {
           type: Number,
           required: false,
           default: 0
      },
-     endereco: new Schema ({
-          rua:{ type: String, required: true },
-          bairro: { type: String, required: true },
-          numero: { type: Number, required: true },
+     address: new Schema ({
+          street:{ type: String, required: true },
+          quarter: { type: String, required: true },
+          number: { type: Number, required: true },
      }),
-     telefone:{
+     phone:{
           type: Number,
           required: true,
      },

@@ -1,9 +1,11 @@
 const Auth = require('./Auth');
 const Login = require('./Login');
+const VerifyImage = require('./VerifyImage');
 
 const Middlewares = {
     Auth,
-    Login
+    Login,
+    VerifyImage
 };
 
 module.exports = Middlewares;

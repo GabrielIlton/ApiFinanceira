@@ -13,15 +13,15 @@ router.post("/login", Middlewares.Login.userLogin, Controllers.AccountController
 
 router.get("/details", Middlewares.Auth.userAuth, Controllers.AccountController.getAccountDetails);
 
-router.get("/balance", Middlewares.Auth.userAuth, Controllers.AccountController.getSaldo);
+router.get("/balance", Middlewares.Auth.userAuth, Controllers.AccountController.getBalance);
 
 router.get("/accounts/list", Middlewares.Auth.userAuth, Controllers.AccountController.getAccounts);
 
-router.post("/passwordsecurity", Middlewares.Auth.userAuth, Controllers.AccountController.createLoginSecurity);
+router.post("/password/security", Middlewares.Auth.userAuth, Controllers.AccountController.createPasswordSecurity);
 
 router.put("/password", Middlewares.Auth.userAuth, Controllers.AccountController.updatePasswordAccount);
 
-router.post("/image", Middlewares.Auth.userAuth, multer(Config.multerConfig).single('file'), Controllers.ImageController.uploadImage);
+router.post("/image", Middlewares.Auth.userAuth, Middlewares.VerifyImage.verifyImage, multer(Config.multerConfig).single('file'), Controllers.ImageController.uploadImage);
 
 router.delete("/image", Middlewares.Auth.userAuth, Controllers.ImageController.deleteImage);
 
@@ -31,9 +31,9 @@ router.put("/retrieve", Controllers.AccountController.retrieveAccount);
 
 router.get("/statement", Middlewares.Auth.userAuth, Controllers.StatementController.listOneAccountStatement);
 
-router.get("/statementByDate", Middlewares.Auth.userAuth, Controllers.StatementController.statementByDate);
+router.get("/statement/bydate", Middlewares.Auth.userAuth, Controllers.StatementController.statementByDate);
 
-router.get("/statement/list", Middlewares.Auth.userAuth, Controllers.StatementController.listAllStatement);
+router.get("/statement/list", Middlewares.Auth.userAuth, Controllers.StatementController.listAllStatements);
 
 router.post("/deposit", Middlewares.Auth.userAuth, Controllers.AccountController.depositAccount);
 

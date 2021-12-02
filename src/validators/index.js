@@ -1,10 +1,12 @@
 const AccountValidators = require('./AccountValidators/Account');
 const StatementValidators = require('./StatementValidators/Statement');
+const ImageValidators = require('./ImageValidators/Image');
 
 
 const Validators = {
     AccountValidators,
-    StatementValidators
+    StatementValidators,
+    ImageValidators
 };
 
 module.exports = Validators;

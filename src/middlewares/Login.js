@@ -1,12 +1,15 @@
 const bcrypt = require('bcryptjs');
-const Repositories = require('../repositories/index');
+const { AccountRepository } = require('../repositories/index');
+const { StatementRepository } = require('../repositories/index');
+const { AccountValidators } = require('../validators/index')
 
 
 class AuthMiddlewares {
     async userLogin (req, res, next) {
         try {
             const login = req.body;
-            const account = await Repositories.AccountRepository.findByDocumentEmail({ email: login.email });
+            await AccountValidators.loginValidator(login)
+            const account = await AccountRepository.findByDocumentEmail({ email: login.email });
             if(!account) throw 'Conta não existe.';
             const passwordCorrect = await bcrypt.compare(login.password, account.password);
             const passwordSecurityCorrect = await bcrypt.compare(login.password, account.passwordSecurity);
@@ -18,26 +21,27 @@ class AuthMiddlewares {
                 
                 const dateNow = new Date().getTime() - (60 * 24 * 60000); 
 
-                const conditionSecurity = {
+                const conditionLoginSecurity = {
                     type: ['withDrawSecurity', 'cashoutP2PSecurity'], accountId: account.id,  created_at: {
                         $gte: new Date(dateNow),
                         $lte: new Date()
                     }
                 };
 
-                const statementSecurity = await Repositories.StatementRepository.findByDateStatements({ condition: conditionSecurity });
+                const statementTransactionsSecurity = await StatementRepository.findByDateStatements({ condition: conditionLoginSecurity });
 
-                if(statementSecurity.length == 0){
+                if(statementTransactionsSecurity.length == 0){
                     if(account.balance >= 1){
                         const balanceSecurity = (account.balance / 100) * 20;
-                        await Repositories.AccountRepository.updateBalanceSecurity({ id: account._id, balanceSecurity });
+                       
+                        await AccountRepository.updateBalanceSecurity({ id: account._id, balanceSecurity });
                     };
                 };
             };
             res.login = { account };
             next();
         } catch (error) {
-            return res.status(400).json({error})
+            return res.status(400).json({ error })
         } 
     };
 };

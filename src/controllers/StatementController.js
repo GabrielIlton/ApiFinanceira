@@ -1,11 +1,11 @@
-const Services = require('../services/index');
+const { StatementService } = require('../services/index');
 
 
 class StatementController { 
     async listOneAccountStatement (req, res) {
         try {
             const { token } = res.auth;
-            const accountStatement = await Services.StatementService.listOneAccountStatement({ token });
+            const accountStatement = await StatementService.listOneAccountStatement({ token });
             const finalReturn = accountStatement.map(account => ({ 
                 amount: account.amount,
                 type: account.type,
@@ -13,7 +13,7 @@ class StatementController {
             }));
             return res.status(200).json({ accountStatement: finalReturn });
         } catch (error) {
-            return res.status(404).json({ message: error });
+            return res.status(404).json({ error });
         };
     };
     
@@ -21,7 +21,7 @@ class StatementController {
         try {
             const { token } = res.auth;
        
-            const statements = await Services.StatementService.statementByDate({ token, query: req.query });
+            const statements = await StatementService.statementByDate({ token, query: req.query });
             
             const finalReturn = statements.map(account => ({ 
                 amount: account.amount,
@@ -31,15 +31,15 @@ class StatementController {
 
             return res.status(200).json({ finalReturn });
         } catch (error) {
-            return res.status(404).json({message: error});
+            return res.status(404).json({ error });
         };
     };
     
-    async listAllStatement (req, res) {
+    async listAllStatements (req, res) {
         try {
             const { token } = res.auth;
            
-            const statements = await Services.StatementService.listAllStatements({ token });
+            const statements = await StatementService.listAllStatements({ token });
             const finalReturn = statements.map(account => ({ 
                 accountId: account.accountId,
                 amount: account.amount,
@@ -49,7 +49,7 @@ class StatementController {
 
             return res.status(200).json({ finalReturn });
         } catch (error) {
-            return res.status(404).json({message: error});
+            return res.status(404).json({ error });
         };
     };
 }

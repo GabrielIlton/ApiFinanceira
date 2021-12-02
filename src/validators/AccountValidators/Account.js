@@ -5,14 +5,14 @@ function validateEmail(email) {
 
 class AccountValidator {   
     async accountCreateValidator(body) {         
+        if(!body.email) throw 'Email é obrigatório.';
         if(!validateEmail(body.email)) throw 'Email deve ter uma estrutura adequada, como por exemplo "karrlus@gmail.com".'
         if(!body.name) throw 'Nome é obrigatório.';
         if(!body.cpf) throw 'CPF é obrigatório.';
         if(String(body.cpf).length != 11) throw 'CPF deve ser igual a 11 caracteres.';
-        if(!body.endereco) throw 'Endereco é obrigatório.';
-        if(!body.telefone) throw 'Número de telefone é obrigatório juntamente com o DDD.';
-        if(String(body.telefone).length != 11) throw 'A quantidade de números de telefone deve ser igual a 11.';
-        if(!body.email) throw 'Email é obrigatório.';
+        if(!body.address) throw 'Endereco é obrigatório.';
+        if(!body.phone) throw 'Número de telefone é obrigatório juntamente com o DDD.';
+        if(String(body.phone).length != 11) throw 'A quantidade de números de telefone deve ser igual a 11.';
         if(!body.password) throw 'Senha é obrigatória.';
         if(body.password.length != 6 ) throw 'Senha deve conter 6 caracteres.';
     };
@@ -24,7 +24,12 @@ class AccountValidator {
         if(body.passwordNew.length != 6) throw 'Senha conter 6 caracteres.';
     };
 
-    async loginSecurity(body) {
+    async loginValidator(body) {
+        if(!body.email) throw 'Email é obrigatório.';
+        if(!body.password) throw 'Senha é obrigatória.';
+    };
+
+    async passwordSecurityValidator(body) {
         if(!body.passwordSecurity) throw 'Senha de segurança é obrigatória.';
         if(body.passwordSecurity.length != 6 ) throw 'Senha deve conter 6 caracteres.';
     };
@@ -42,7 +47,7 @@ class AccountValidator {
     };
 
     async withdrawAccountValidator(body) {
-        if(body.withdraw < 1) throw 'O valor do saque é obrigatório.';
+        if(body.withDraw < 1) throw 'O valor do saque é obrigatório e deve ser maior ou igual a R$1.';
     };
 
     async P2PValidator(body){

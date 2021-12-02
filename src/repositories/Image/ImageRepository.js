@@ -1,17 +1,17 @@
-const Models = require('../../models/index');//*Importa a collection de models
+const { ImageModel } = require('../../models/index');
 
 
 class ImageRepository {
     async findImageByIdAndDeletedFalse ({ id }) {
-        return await Models.ImageModel.findOne({ accountId: id, deleted: false });
+        return await ImageModel.findOne({ accountId: id, deleted: false });
     };
     
     async findByIdAndDeleteImage ({ id }) {
-        return await Models.ImageModel.findOneAndUpdate({ accountId: id, deleted: false }, { deleted: true })
+        return await ImageModel.findOneAndUpdate({ accountId: id, deleted: false }, { deleted: true })
     };
 
     async createImage ({ file, token, base64 }) {
-        const imageUpload = await Models.ImageModel.create({
+        const imageUpload = await ImageModel.create({
             name: file.originalname, 
             size: file.size, 
             key: file.key, 

@@ -1,4 +1,4 @@
-const Validators = require('../../validators/index');
+const { AccountValidators } = require('../../validators/index');
 const jwt = require('jsonwebtoken');//*Importa o jsonwebtoken
 const authConfig = require('../../config/auth');//*Importa o authConfig
 const bcrypt = require('bcryptjs');//*Importa o bcryptjs
@@ -8,10 +8,10 @@ const axios = require('axios');
 
 class AccountService {
     async createAccount ({ body }) { 
-        await Validators.AccountValidators.accountCreateValidator(body);
+        await AccountValidators.accountCreateValidator(body);
 
         const accountVerifyCpf = await Repositories.AccountRepository.findByDocumentCpf({ cpf: body.cpf })
-        const accountVerifyEmail = await Repositories.AccountRepository.findByDocumentEmail({ email: body.email });//*Faz a pesquisa se email já existe
+        const accountVerifyEmail = await Repositories.AccountRepository.findByDocumentEmail({ email: body.email });
         if(accountVerifyCpf || accountVerifyEmail) throw 'CPF ou email já existente.';
 
         return await Repositories.AccountRepository.createAccount({ body }) 
@@ -42,34 +42,33 @@ class AccountService {
         if(token.password) {
             return { account, balance: account.balance };
         } else {
-            return { account, balance: account.balanceSecurity };
+            const integerBalance = parseFloat(account.balanceSecurity.toPrecision(5));
+            return { account, balance: integerBalance };
         }  
     };
 
     async getAccounts ({ token }) {
-        const accountAdmin = await Repositories.AccountRepository.findByAdmin({ id: token.account_id });
-        if(!accountAdmin) throw 'Você não tem acesso a essa rota.';
+        const accountAdminTrue = await Repositories.AccountRepository.findByAdmin({ id: token.account_id });
+        if(!accountAdminTrue) throw 'Você não tem acesso a essa rota.';
         const allAccounts = await Repositories.AccountRepository.findAllAccounts({ });
         return allAccounts;
     };
 
-    async accountLoginSecurity ({ token, body }) {
+    async accountPasswordSecurity ({ token, body }) {
         if(token.passwordSecurity) throw 'Não foi possível acessar esse comando.';
-        await Validators.AccountValidators.loginSecurity(body);
+        await AccountValidators.passwordSecurityValidator(body);
         const account = await Repositories.AccountRepository.findById({ id: token.account_id });
-        if(!account.passwordSecurity) throw 'Você já possui uma senha de segurança.' 
-        if(account.passwordSecurity && account.balanceSecurity) throw 'Você já possui uma senha e valor de segurança.';
+        if(!account.passwordSecurity == "") throw 'Você já possui uma senha de segurança.'; 
         const passwordSecurity = await bcrypt.hash(body.passwordSecurity, 10);
-        const createSecurity = await Repositories.AccountRepository.createSecurity({ id: account._id, passwordSecurity });
-        if(!createSecurity) throw 'Não foi possível criar sua senha e valor de segurança.';
+        const createPasswordSecurity = await Repositories.AccountRepository.createPasswordSecurity({ id: account._id, passwordSecurity });
         
-        return createSecurity;
+        return createPasswordSecurity;
     };
 
     async updatePasswordAccount ({ body, token }) {
-        if(token.passwordSecurity) throw 'Não é possível alterar senha no momento.';
+        if(token.passwordSecurity) throw 'Não é possível alterar senha.';
 
-        await Validators.AccountValidators.updatePasswordAccountValidator( body );
+        await AccountValidators.updatePasswordAccountValidator( body );
 
         const verifyEmail = await Repositories.AccountRepository.findByDocumentEmail({ email: body.email });
         if(!verifyEmail) throw 'Conta não existe.';
@@ -91,10 +90,11 @@ class AccountService {
         };
 
         if(token.admin === true) {
-            await Validators.AccountValidators.deleteAccountValidator( body );
-            const findCpf = await Repositories.AccountRepository.findByDocumentCpf({ cpf: body.cpf });
-            const deleteAccount = await Repositories.AccountRepository.findOneAndUpadateDelete({ id: findCpf.id });
-            if(!deleteAccount) throw 'Conta não existe.';
+            await AccountValidators.deleteAccountValidator( body );
+            const findByCpf = await Repositories.AccountRepository.findByDocumentCpf({ cpf: body.cpf });
+            if(!findByCpf) throw 'Conta não existe.';
+            const deleteAccount = await Repositories.AccountRepository.findOneAndUpadateDelete({ id: findByCpf.id });
+            if(!deleteAccount) throw 'Conta já deletada.' 
             return deleteAccount;
         }
         if(body.cpf) throw 'Você não tem acesso para deletar contas.';
@@ -104,7 +104,7 @@ class AccountService {
     };
 
     async retrieveAccount ({ body }) { 
-        await Validators.AccountValidators.retrieveAccountValidator( body );//!Validators
+        await AccountValidators.retrieveAccountValidator( body );
 
         const accountExists = await Repositories.AccountRepository.findByDocumentCpf({ cpf: body.cpf });
         if(!accountExists) throw 'Conta não existe.';
@@ -117,35 +117,36 @@ class AccountService {
     };
 
     async depositAccount ({ body, token }) {
-        await Validators.AccountValidators.depositAccountValidator( body )
+        await AccountValidators.depositAccountValidator( body )
         
-        const createDeposit = await Repositories.StatementRepository.depositCreateStatement({ deposit: body.deposit, token });
+        await Repositories.StatementRepository.depositCreateStatement({ deposit: body.deposit, token });
         const accountBalance = await Repositories.AccountRepository.findById({ id: token.account_id });
 
         const total = body.deposit + accountBalance.balance; 
-        const depositAccount = await Repositories.AccountRepository.findOneAndUpdateBalance({ id: token.account_id, total });
+        await Repositories.AccountRepository.findOneAndUpdateBalance({ id: token.account_id, total });
         const account = await Repositories.AccountRepository.findById({ id: token.account_id });
         
         return account;
     };
 
     async withDrawAccount ({ body, token }) {
-       if(token.password){
-            await Validators.AccountValidators.withdrawAccountValidator(body);//!Validators
+        if(token.password){
+            await AccountValidators.withdrawAccountValidator(body);
             const account = await Repositories.AccountRepository.findById({ id: token.account_id });
 
             if(body.withDraw <= account.balance){
                 await Repositories.StatementRepository.withDrawCreateStatement({ withDraw: body.withDraw, token });
                 const total = account.balance - body.withDraw;
-                const withDrawAccount = await Repositories.AccountRepository.findOneAndUpdateBalance({ id: token.account_id, total });
-                return account;
+                await Repositories.AccountRepository.findOneAndUpdateBalance({ id: token.account_id, total });
+                parseFloat(account.balance.toFixed(2))
+                return { account, balance: account.balance };
             } else{
                 throw "Saldo insuficiente.";
             };
-       };
+        };
 
-       if(token.passwordSecurity){
-            await Validators.AccountValidators.withdrawAccountValidator(body);
+        if(token.passwordSecurity){
+            await AccountValidators.withdrawAccountValidator(body);
             const account = await Repositories.AccountRepository.findById({ id: token.account_id });
 
             if(body.withDraw <= account.balanceSecurity){
@@ -153,8 +154,10 @@ class AccountService {
                 await Repositories.AccountRepository.updateBalanceSecurity({ id: account._id, balanceSecurity }); 
                 await Repositories.StatementRepository.withDrawCreateStatementSecurity({ withDraw: body.withDraw, token });
                 const total = account.balance - body.withDraw;
+                const integerBalance = parseFloat(account.balanceSecurity.toPrecision(5));
                 await Repositories.AccountRepository.findOneAndUpdateBalance({ id: token.account_id, total });
-                return { account };
+               
+                return { account, balance: integerBalance };
             } else{
                 throw 'Saldo insuficiente.';
             };
@@ -162,7 +165,7 @@ class AccountService {
     };
 
     async p2p ({ body, token }) {
-        await Validators.AccountValidators.P2PValidator(body);
+        await AccountValidators.P2PValidator(body);
 
         if(token.password){
             const accountReciever = await Repositories.AccountRepository.findByDocumentCpf({ cpf: body.cpfReciever });

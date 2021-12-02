@@ -33,13 +33,13 @@
                                         "name": "Anjo",
                                         "cpf": 10000000000,
                                         "email": "anjo@gmail.com",
-                                        "password": "1000",
-                                        "endereco": {
-                                            "rua": "Bornoia",
-                                            "bairro": "Comyto",
-                                            "numero": 63
+                                        "password": "100000",
+                                        "address": {
+                                            "street": "Bornoia",
+                                            "quarter": "Comyto",
+                                            "number": 63
                                         },
-                                        "telefone": 14999999999
+                                        "phone": 14999999999
                                     }
                                 }
                             }
@@ -57,8 +57,9 @@
                                 "examples": {
                                     "account": {
                                         "value": {
-                                            "name": "Nome do usuário",
-                                            "email": "Email do usuario"
+                                            "name": "Nome do usuário.",
+                                            "email": "Email do usuario.",
+                                            "message": "Sucesso ao criar conta."
                                         }
                                     }
                                 }
@@ -84,7 +85,7 @@
                                 "login": {
                                     "value": {
                                         "email": "anjo@gmail.com",
-                                        "password": "1000"
+                                        "password": "100000"
                                     }
                                 }
                             }
@@ -129,7 +130,7 @@
                         "description": "Falha ao resgatar detalhes da conta."
                     },
                     "200": {
-                        "description": "Sucesso ao resgatar os detalhes da conta",
+                        "description": "Sucesso ao resgatar os detalhes da conta.",
                         "content": {
                             "application/json": {
                                 "examples":{
@@ -138,11 +139,12 @@
                                             "name": "Retorna o nome da conta salva no banco.",
                                             "cpf": "Retorna o CPF da conta.",
                                             "email": "Retorna o email da conta.",
-                                            "endereco": {
-                                                "rua": "Retorna a rua cadastrada no endereco da conta.",
-                                                "bairro": "Retorna o bairro cadastrado no endereco da conta.",
-                                                "numero": "Retorna o numero cadastrado no endereco da conta."                                            },
-                                            "telefone": "Retorna o telefone da conta salva no banco.",
+                                            "address": {
+                                                "street": "Retorna a rua cadastrada no endereco da conta.",
+                                                "quarter": "Retorna o bairro cadastrado no endereco da conta.",
+                                                "number": "Retorna o numero cadastrado no endereco da conta."                                            
+                                            },
+                                            "phone": "Retorna o telefone da conta salva no banco.",
                                             "admin": "Retorna o status de admin da conta se é verdadeiro ou falso."
                                         }
                                     }
@@ -176,7 +178,7 @@
                                     "balance": {
                                         "value": {
                                             "name": "Nome da conta que está sendo recuperado o saldo.",
-                                            "saldo": "Retorna o saldo da conta."
+                                            "balance": "Retorna o saldo da conta."
                                         }
                                     }
                                 }
@@ -238,9 +240,9 @@
                             "examples": {
                                 "updatePassword": {
                                     "value": {
-                                        "passwordOld": "1000",
+                                        "passwordOld": "100000",
                                         "email": "anjo@gmail.com",
-                                        "passwordNew": "1100"
+                                        "passwordNew": "110000"
                                     }
                                 }
                             }
@@ -258,7 +260,7 @@
                                 "examples":{
                                     "updatePassword": {
                                         "value": {
-                                            "nome":"Nome do usuario que teve a senha alterada.",
+                                            "name":"Nome do usuario que teve a senha alterada.",
                                             "message": "Senha alterada com sucesso."
                                         }
                                     }
@@ -455,7 +457,7 @@
             }
         },
 
-        "/statementByDate": {
+        "/statement/bydate": {
             "get": {
                 "summary": "Busca o estrato por data de uma conta única.",
                 "description": "Busca o estrato por data de uma conta única, que no caso seria o Id recebido do token no Headers.",
@@ -515,7 +517,7 @@
                     "400": {
                         "description": "Falha ao resgatar os estratos."
                     },
-                    "201": {
+                    "200": {
                         "description": "Sucesso ao recuperar todos os estratos.",
                         "content": {
                             "application/json": {
@@ -574,7 +576,7 @@
                                     "deposit": {
                                         "value": {
                                             "name": "Retorna o name da conta depositada.",
-                                            "Saldo": "Retorna o saldo da total conta depositada."
+                                            "balance": "Retorna o saldo da total conta depositada."
                                         }
                                     }
                                 }
@@ -622,9 +624,8 @@
                                 "examples":{
                                     "withdraw": {
                                         "value": {
-                                            "name": "Retorna o name da conta.",
-                                            "saque": "Retorna a quantidade do saque.",
-                                            "saldo": "Retorna o saldo total da conta após o saque."
+                                            "withdraw": "Retorna a quantidade do saque.",
+                                            "balance": "Retorna o saldo total da conta após o saque."
                                         }
                                     }
                                 }
@@ -675,7 +676,7 @@
                                         "value": {
                                             "accountSend": "Nome da conta que está realizando a transferência.",
                                             "cashout": "Valor que está saindo da conta de 'accountSend'.",
-                                            "saldo": "Saldo da conta do enviador após a transação.",
+                                            "balance": "Saldo da conta do enviador após a transação.",
                                             "accountReciever": "Nome da conta que está recebendo a transferência.",
                                             "cashin": "Valor que está entrando na conta do 'accountReciever'.",
                                             "response": "'Nome de quem transferiu', e uma mensagem de sucesso."
@@ -706,18 +707,18 @@
                     "password": {
                         "type": "string"
                     },
-                    "endereco": {
-                        "rua": {
+                    "address": {
+                        "street": {
                             "type":"string"
                         },
-                        "bairro":{
+                        "quarter":{
                             "type":"string"
                         },
-                        "numero": {
+                        "number": {
                             "type":"number"
                         }   
                     },
-                    "telefone":{
+                    "phone":{
                         "type": "number"
                     },
                     "admin": {

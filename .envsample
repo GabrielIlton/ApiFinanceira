@@ -1,0 +1,8 @@
+APP_URL=http://localhost:3333
+
+MONGO_URL=mongodb://localhost:27017/apiFinanceira
+
+TOKEN_SECRET
+TOKEN_EXPIRES
+
+WEBHOOKP2P_URL=http://localhost:8080/webhookp2p

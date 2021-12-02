@@ -1,71 +1,71 @@
-const Models = require('../../models/index');//*Importa a collection de models
-
+const { AccountModel } = require('../../models/index');
 
 class AccountRepository {
     async findByDocumentCpf ({ cpf }) {
-        const account = await Models.AccountModel.findOne({ cpf });
+        const account = await AccountModel.findOne({ cpf });
         return account;
     };
 
     async findByDocumentEmail ({ email }) {
-       return await Models.AccountModel.findOne({ email, deleted: false });
+       return await AccountModel.findOne({ email, deleted: false });
     };
 
     async createAccount ({ body }) {
-        return await Models.AccountModel.create({//*Requere e cria no banco os dados
+        return await AccountModel.create({
             name: body.name[0].toUpperCase() + body.name.substring(1).toLowerCase(),
             cpf: body.cpf,
             email: body.email.toLowerCase(),
             password: body.password,
-            endereco: {rua: body.endereco.rua, bairro: body.endereco.bairro, numero: body.endereco.numero},//*Cria um objeto no banco
-            telefone: body.telefone
+            address: {street: body.address.street, quarter: body.address.quarter, number: body.address.number},
+            phone: body.phone,
+            admin: body.admin
         });
     };
 
-    async createSecurity ({ id, passwordSecurity }) {
-        return await Models.AccountModel.findOneAndUpdate({ _id: id,  }, { passwordSecurity });
+    async createPasswordSecurity ({ id, passwordSecurity }) {
+        return await AccountModel.findOneAndUpdate({ _id: id,  }, { passwordSecurity });
     };
 
     async updateBalanceSecurity ({ id, balanceSecurity }) {
-        return await Models.AccountModel.findOneAndUpdate({ _id: id,  }, { balanceSecurity });
+        return await AccountModel.findOneAndUpdate({ _id: id,  }, { balanceSecurity });
     };
 
     async findByAccountDeletedTrue ({ cpf }) {
-        return await Models.AccountModel.findOne({ cpf, deleted: true });
+        return await AccountModel.findOne({ cpf, deleted: true });
     };
 
     async findById ({ id }) {
-        const account = await Models.AccountModel.findOne({ _id: id, deleted: false }).lean();
+        const account = await AccountModel.findOne({ _id: id, deleted: false }).lean();
         return account;
     };
 
     async findByAdmin ({ id }) {
-        const accountAdmin = await Models.AccountModel.findOne({ _id: id, deleted: false, admin: true });
+        const accountAdmin = await AccountModel.findOne({ _id: id, deleted: false, admin: true });
         return accountAdmin;
     };
 
     async findAllAccounts ({}) {
-        const allAccounts = await Models.AccountModel.find({});
+        const allAccounts = await AccountModel.find({});
         return allAccounts;
     };
 
     async findOneAndUpadatePassword ({ id, passwordNew }) {
-        const account = await Models.AccountModel.findOneAndUpdate({ _id: id, deleted: false}, { password: passwordNew });//*Encontra o cpf não deletado e add um name novo
+        const account = await AccountModel.findOneAndUpdate({ _id: id, deleted: false}, { password: passwordNew });
         return account;
     };
 
     async findOneAndUpadateDelete ({ id }) {
-        const accountDelete = await Models.AccountModel.findOneAndUpdate({ _id: id, deleted: false}, { deleted: true });
+        const accountDelete = await AccountModel.findOneAndUpdate({ _id: id, deleted: false}, { deleted: true });
         return accountDelete;
     };
 
     async findOneAndUpadateRetrieve ({ cpf }) {
-        const accountRetrieve = await Models.AccountModel.findOneAndUpdate({ cpf , deleted: true}, { deleted: false });
+        const accountRetrieve = await AccountModel.findOneAndUpdate({ cpf , deleted: true}, { deleted: false });
         return accountRetrieve;
     };
 
     async findOneAndUpdateBalance ({ id, total }) {
-        const balanceAccount = await Models.AccountModel.findOneAndUpdate({ _id: id }, { balance: total });
+        const balanceAccount = await AccountModel.findOneAndUpdate({ _id: id }, { balance: total }, { new: true });
         return balanceAccount;
     };
 }
